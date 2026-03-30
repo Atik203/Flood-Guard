@@ -6,11 +6,12 @@ import {
   Waves, Cpu, Brain, Bell, Shield, Activity,
   ArrowRight, ChevronDown, Wifi, Database, Zap,
   BarChart3, MessageCircle, Droplets, CloudRain, Wind, Thermometer,
-  CheckCircle, Globe, BookOpen,
+  CheckCircle, Globe, BookOpen, Sun, Moon,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { useTheme } from '@/context/ThemeProvider';
 
 /* ─── Animated background ─────────────────────────────── */
 function HeroBg() {
@@ -119,7 +120,7 @@ const STACK = [
   { label: 'Python 3.11',    icon: '🐍', color: '#00E676' },
   { label: 'scikit-learn',   icon: '🤖', color: '#C084FC' },
   { label: 'Mosquitto MQTT', icon: '📡', color: '#FFAA00' },
-  { label: 'Next.js 16',     icon: '▲',  color: '#E8F4FF' },
+  { label: 'Next.js 16',     icon: '▲',  color: '#00C8FF' },
   { label: 'SQLite',         icon: '🗄️', color: '#00E676' },
   { label: 'Telegram API',   icon: '✈️', color: '#00C8FF' },
   { label: 'Tailwind CSS',   icon: '🎨', color: '#C084FC' },
@@ -161,9 +162,21 @@ export default function HomePage() {
   const { scrollYProgress } = useScroll({ target: heroRef });
   const heroOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
   const heroScale   = useTransform(scrollYProgress, [0, 0.5], [1, 0.95]);
+  const { theme, toggleTheme } = useTheme();
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen relative">
+      
+      {/* Theme Toggle Button */}
+      <div className="fixed top-6 right-6 z-50">
+        <button
+          onClick={toggleTheme}
+          className="flex items-center justify-center w-12 h-12 rounded-full border border-border/50 bg-background/80 backdrop-blur-md shadow-lg text-foreground hover:bg-accent hover:scale-110 transition-all duration-300"
+          title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+        >
+          {theme === 'dark' ? <Sun size={20} className="text-fg-amber" /> : <Moon size={20} className="text-fg-purple" />}
+        </button>
+      </div>
 
       {/* ─ HERO ─────────────────────────────────────────── */}
       <section ref={heroRef} className="relative min-h-screen flex flex-col items-center justify-center px-4 sm:px-8 py-20 text-center overflow-hidden">
@@ -232,7 +245,7 @@ export default function HomePage() {
       </section>
 
       {/* ─ TECH STACK ───────────────────────────────────── */}
-      <section className="py-16 border-y border-border/30 overflow-hidden bg-card/30">
+      <section className="py-20 border-y border-border/30 overflow-hidden bg-muted/20">
         <div className="max-w-6xl mx-auto px-4">
           <SectionLabel>Technology Stack</SectionLabel>
           <div className="flex flex-wrap items-center justify-center gap-3 mt-6">
@@ -240,7 +253,7 @@ export default function HomePage() {
               <motion.div key={t.label}
                 initial={{ opacity:0, y:12 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
                 transition={{ delay: i*0.05 }}
-                className="flex items-center gap-3 px-5 py-3 rounded-2xl border-2 border-border/50 bg-card hover:border-fg-cyan/40 hover:scale-[1.03] transition-all duration-200 cursor-default shadow-sm"
+                className="flex items-center gap-3 px-5 py-3 rounded-2xl border-2 border-border/50 bg-background hover:border-fg-cyan/40 hover:scale-[1.03] transition-all duration-200 cursor-default shadow-sm"
               >
                 <span className="text-2xl leading-none">{t.icon}</span>
                 <span className="text-base font-bold text-foreground tracking-wide">{t.label}</span>
@@ -294,7 +307,7 @@ export default function HomePage() {
       </section>
 
       {/* ─ SYSTEM FLOW ──────────────────────────────────── */}
-      <section className="py-24 px-4 sm:px-8 bg-card/20 border-y border-border/20">
+      <section className="py-24 px-4 sm:px-8 bg-muted/20 border-y border-border/20">
         <div className="max-w-5xl mx-auto">
           <motion.div initial={{ opacity:0, y:24 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} className="text-center mb-16">
             <SectionLabel>How It Works</SectionLabel>
@@ -364,7 +377,7 @@ export default function HomePage() {
       </section>
 
       {/* ─ ARCHITECTURE PREVIEW ─────────────────────────── */}
-      <section className="py-24 px-4 sm:px-8 bg-card/20 border-y border-border/20">
+      <section className="py-24 px-4 sm:px-8 bg-muted/20 border-y border-border/20">
         <div className="max-w-5xl mx-auto">
           <motion.div initial={{ opacity:0, y:24 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} className="text-center mb-12">
             <SectionLabel>System Architecture</SectionLabel>
