@@ -6,7 +6,7 @@ import {
   Waves, Cpu, Brain, Bell, Shield, Activity,
   ArrowRight, ChevronDown, Wifi, Database, Zap,
   BarChart3, MessageCircle, Droplets, CloudRain, Wind, Thermometer,
-  CheckCircle, Github, Globe, BookOpen,
+  CheckCircle, Globe, BookOpen,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -57,10 +57,10 @@ function HeroBg() {
 /* ─── Section label ───────────────────────────────────── */
 function SectionLabel({ children }: { children: string }) {
   return (
-    <div className="flex items-center justify-center gap-3 mb-4">
-      <div className="h-px w-12 bg-gradient-to-r from-transparent to-fg-cyan/50" />
-      <span className="text-[11px] font-mono tracking-[4px] text-fg-cyan/80 uppercase">{children}</span>
-      <div className="h-px w-12 bg-gradient-to-l from-transparent to-fg-cyan/50" />
+    <div className="flex items-center justify-center gap-4 mb-6">
+      <div className="h-px w-16 bg-gradient-to-r from-transparent to-fg-cyan/50" />
+      <span className="text-base font-mono tracking-[6px] text-fg-cyan/90 uppercase font-bold">{children}</span>
+      <div className="h-px w-16 bg-gradient-to-l from-transparent to-fg-cyan/50" />
     </div>
   );
 }
@@ -172,8 +172,8 @@ export default function HomePage() {
         <motion.div style={{ opacity: heroOpacity, scale: heroScale }} className="relative z-10 max-w-4xl mx-auto">
           {/* Badge */}
           <motion.div initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.1 }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-fg-cyan/30 bg-fg-cyan/8 text-fg-cyan text-xs font-mono font-bold tracking-widest uppercase mb-8">
-            <span className="w-1.5 h-1.5 rounded-full bg-fg-cyan animate-pulse-dot shadow-[0_0_5px_#00C8FF]" />
+            className="inline-flex items-center gap-3 px-6 py-2.5 rounded-full border border-fg-cyan/40 bg-fg-cyan/10 text-fg-cyan text-base font-mono font-bold tracking-widest uppercase mb-10 shadow-[0_0_15px_rgba(0,200,255,0.15)]">
+            <span className="w-2.5 h-2.5 rounded-full bg-fg-cyan animate-pulse-dot shadow-[0_0_8px_#00C8FF]" />
             Microprocessor Lab Project
           </motion.div>
 
@@ -202,12 +202,12 @@ export default function HomePage() {
           <motion.div initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.5 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/dashboard"
-              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-fg-cyan text-dark-base font-bold text-sm hover:bg-fg-cyan/90 hover:scale-105 transition-all duration-200 shadow-[0_0_24px_rgba(0,200,255,0.4)]">
-              <Activity size={17} /> Open Live Dashboard <ArrowRight size={15} />
+              className="inline-flex items-center gap-3 px-8 py-4 rounded-xl bg-fg-cyan text-dark-base font-bold text-lg hover:bg-fg-cyan/90 hover:scale-105 transition-all duration-200 shadow-[0_0_32px_rgba(0,200,255,0.4)]">
+              <Activity size={20} /> Open Live Dashboard <ArrowRight size={18} />
             </Link>
             <Link href="/architecture"
-              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl border border-border/60 text-foreground font-semibold text-sm hover:bg-accent hover:border-fg-cyan/40 transition-all duration-200">
-              <Cpu size={17} /> View Architecture
+              className="inline-flex items-center gap-3 px-8 py-4 rounded-xl border border-border/80 text-foreground font-bold text-lg hover:bg-accent hover:border-fg-cyan/50 transition-all duration-200">
+              <Cpu size={20} /> View Architecture
             </Link>
           </motion.div>
 
@@ -217,8 +217,8 @@ export default function HomePage() {
             {STATS.map((s, i) => (
               <motion.div key={s.label} initial={{ opacity:0, scale:0.8 }} animate={{ opacity:1, scale:1 }} transition={{ delay: 0.7 + i*0.08 }}
                 className="text-center">
-                <p className="font-mono text-3xl font-extrabold" style={{ color: s.color }}>{s.value}</p>
-                <p className="text-xs text-muted-foreground mt-1 font-mono">{s.label}</p>
+                <p className="font-mono text-5xl font-extrabold mb-2" style={{ color: s.color }}>{s.value}</p>
+                <p className="text-base text-muted-foreground mt-1 font-mono font-medium tracking-wide">{s.label}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -240,10 +240,10 @@ export default function HomePage() {
               <motion.div key={t.label}
                 initial={{ opacity:0, y:12 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
                 transition={{ delay: i*0.05 }}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl border border-border/50 bg-card hover:border-fg-cyan/30 hover:scale-105 transition-all duration-200 cursor-default"
+                className="flex items-center gap-3 px-5 py-3 rounded-2xl border-2 border-border/50 bg-card hover:border-fg-cyan/40 hover:scale-[1.03] transition-all duration-200 cursor-default shadow-sm"
               >
-                <span className="text-lg leading-none">{t.icon}</span>
-                <span className="text-sm font-semibold text-foreground">{t.label}</span>
+                <span className="text-2xl leading-none">{t.icon}</span>
+                <span className="text-base font-bold text-foreground tracking-wide">{t.label}</span>
               </motion.div>
             ))}
           </div>
@@ -275,11 +275,11 @@ export default function HomePage() {
                     <div className="w-11 h-11 rounded-xl flex items-center justify-center mb-4" style={{ background: `${f.color}15` }}>
                       <Icon size={22} style={{ color: f.color }} />
                     </div>
-                    <h3 className="text-base font-bold text-foreground mb-2">{f.title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed mb-4">{f.desc}</p>
-                    <div className="flex flex-wrap gap-1.5">
+                    <h3 className="text-xl font-bold text-foreground mb-3">{f.title}</h3>
+                    <p className="text-base text-muted-foreground leading-relaxed mb-6">{f.desc}</p>
+                    <div className="flex flex-wrap gap-2">
                       {f.tags.map(tag => (
-                        <span key={tag} className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md border"
+                        <span key={tag} className="text-sm font-mono font-bold px-3 py-1.5 rounded-lg border-2 shadow-sm"
                           style={{ color: f.color, background: `${f.color}10`, borderColor: `${f.color}25` }}>
                           {tag}
                         </span>
@@ -314,22 +314,22 @@ export default function HomePage() {
                 >
                   {/* Left: number + line */}
                   <div className="flex flex-col items-center">
-                    <div className="w-11 h-11 rounded-full flex items-center justify-center font-mono font-bold text-sm border-2 shrink-0"
+                    <div className="w-14 h-14 rounded-full flex items-center justify-center font-mono font-extrabold text-xl border-4 shrink-0 shadow-md"
                       style={{ borderColor: step.color, color: step.color, background: `${step.color}12` }}>
                       {step.step}
                     </div>
-                    {!isLast && <div className="w-px flex-1 my-2" style={{ background: `linear-gradient(to bottom, ${step.color}40, transparent)` }} />}
+                    {!isLast && <div className="w-1 flex-1 my-3" style={{ background: `linear-gradient(to bottom, ${step.color}40, transparent)` }} />}
                   </div>
 
                   {/* Right: content */}
-                  <div className={cn('pb-8 flex-1', isLast ? 'pb-0' : '')}>
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${step.color}15` }}>
-                        <Icon size={16} style={{ color: step.color }} />
+                  <div className={cn('pb-12 flex-1', isLast ? 'pb-0' : '')}>
+                    <div className="flex items-center gap-4 mb-3">
+                      <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-sm" style={{ background: `${step.color}15` }}>
+                        <Icon size={22} style={{ color: step.color }} />
                       </div>
-                      <h3 className="text-base font-bold text-foreground">{step.title}</h3>
+                      <h3 className="text-xl font-bold text-foreground">{step.title}</h3>
                     </div>
-                    <p className="text-sm text-muted-foreground leading-relaxed pl-11">{step.desc}</p>
+                    <p className="text-base text-muted-foreground leading-relaxed pl-14">{step.desc}</p>
                   </div>
                 </motion.div>
               );
@@ -354,10 +354,10 @@ export default function HomePage() {
               className="rounded-2xl border border-border/50 bg-card p-5 hover:border-border hover:-translate-y-1 transition-all duration-300 group relative overflow-hidden"
             >
               <div className="absolute top-0 inset-x-0 h-[2px] rounded-t-2xl opacity-60" style={{ background: h.color }} />
-              <div className="text-3xl mb-3">{h.icon}</div>
-              <p className="text-[10px] font-mono font-bold tracking-widest uppercase mb-1" style={{ color: h.color }}>{h.role}</p>
-              <h3 className="text-sm font-bold text-foreground mb-2 leading-snug">{h.name}</h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">{h.detail}</p>
+              <div className="text-4xl mb-4">{h.icon}</div>
+              <p className="text-sm font-mono font-bold tracking-[3px] uppercase mb-2" style={{ color: h.color }}>{h.role}</p>
+              <h3 className="text-xl font-bold text-foreground mb-3 leading-snug">{h.name}</h3>
+              <p className="text-base text-muted-foreground leading-relaxed">{h.detail}</p>
             </motion.div>
           ))}
         </div>
@@ -380,19 +380,19 @@ export default function HomePage() {
             ].map((layer, i) => (
               <div key={layer.layer} className="w-full">
                 <motion.div initial={{ opacity:0, x: i%2===0?-20:20 }} whileInView={{ opacity:1, x:0 }} viewport={{ once:true }} transition={{ delay:i*0.1 }}
-                  className={`rounded-2xl border-2 ${layer.bg} bg-card p-5`}>
-                  <p className={`text-[10px] font-mono font-bold tracking-[3px] uppercase mb-3 ${layer.text}`}>{layer.layer}</p>
-                  <div className="flex flex-wrap gap-2">
+                  className={`rounded-3xl border-2 ${layer.bg} bg-card p-6 shadow-sm`}>
+                  <p className={`text-base font-mono font-bold tracking-[4px] uppercase mb-5 ${layer.text}`}>{layer.layer}</p>
+                  <div className="flex flex-wrap gap-3">
                     {layer.items.map(item => (
-                      <span key={item} className={`text-xs px-2.5 py-1 rounded-lg font-medium border bg-background text-foreground border-border/50`}>{item}</span>
+                      <span key={item} className={`text-base px-4 py-2 rounded-xl font-semibold border-2 bg-background text-foreground border-border/60`}>{item}</span>
                     ))}
                   </div>
                 </motion.div>
                 {layer.arrow && (
-                  <div className="flex flex-col items-center py-2 gap-1">
-                    <div className="w-px h-4 bg-gradient-to-b from-border to-transparent" />
-                    <span className="text-[9px] font-mono px-3 py-0.5 rounded-full border border-border/40 text-muted-foreground bg-background animate-blink">{layer.arrow}</span>
-                    <div className="w-px h-4 bg-gradient-to-t from-border to-transparent" />
+                  <div className="flex flex-col items-center py-3 gap-2">
+                    <div className="w-0.5 h-6 bg-gradient-to-b from-border to-transparent" />
+                    <span className="text-sm font-mono px-5 py-1.5 rounded-full border-2 border-border/50 text-muted-foreground bg-background font-bold animate-blink tracking-widest">{layer.arrow}</span>
+                    <div className="w-0.5 h-6 bg-gradient-to-t from-border to-transparent" />
                   </div>
                 )}
               </div>
@@ -445,12 +445,12 @@ export default function HomePage() {
               return (
                 <motion.div key={item.label} initial={{ opacity:0, y:10 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} transition={{ delay: i*0.1 }}
                   className="flex items-center gap-4 rounded-xl border border-border/50 bg-card p-4">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${item.color}15` }}>
-                    <Icon size={18} style={{ color: item.color }} />
+                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-sm" style={{ background: `${item.color}15` }}>
+                    <Icon size={24} style={{ color: item.color }} />
                   </div>
                   <div>
-                    <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">{item.label}</p>
-                    <p className="text-sm font-semibold text-foreground">{item.value}</p>
+                    <p className="text-sm font-mono text-muted-foreground uppercase tracking-[3px] font-bold mb-1">{item.label}</p>
+                    <p className="text-lg font-bold text-foreground">{item.value}</p>
                   </div>
                 </motion.div>
               );
@@ -476,32 +476,32 @@ export default function HomePage() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/dashboard"
-              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-fg-cyan text-dark-base font-bold text-sm hover:bg-fg-cyan/90 hover:scale-105 transition-all duration-200 shadow-[0_0_24px_rgba(0,200,255,0.35)]">
-              <Activity size={17} /> Open Dashboard
+              className="inline-flex items-center gap-3 px-8 py-4 rounded-xl bg-fg-cyan text-dark-base font-bold text-lg hover:bg-fg-cyan/90 hover:scale-[1.03] transition-all duration-200 shadow-[0_0_32px_rgba(0,200,255,0.4)]">
+              <Activity size={20} /> Open Dashboard
             </Link>
             <Link href="/architecture"
-              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl border border-border/60 text-foreground font-semibold text-sm hover:bg-accent transition-all duration-200">
-              <Cpu size={17} /> Architecture Overview
+              className="inline-flex items-center gap-3 px-8 py-4 rounded-xl border-2 border-border/80 text-foreground font-bold text-lg hover:bg-accent hover:border-fg-cyan/50 transition-all duration-200">
+              <Cpu size={20} /> Architecture Overview
             </Link>
           </div>
         </motion.div>
       </section>
 
       {/* ─ FOOTER ───────────────────────────────────────── */}
-      <footer className="border-t border-border/20 py-8 px-4 sm:px-8">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-fg-cyan to-fg-cyan/40 flex items-center justify-center">
-              <Waves size={12} className="text-dark-base" />
+      <footer className="border-t border-border/20 py-10 px-4 sm:px-8 bg-card/10">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6 text-base text-muted-foreground">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-fg-cyan to-fg-cyan/40 flex items-center justify-center shadow-sm">
+              <Waves size={16} className="text-dark-base" />
             </div>
-            <span className="font-semibold text-foreground">FloodGuard</span>
+            <span className="font-bold text-foreground tracking-wide">FloodGuard</span>
             <span>·</span>
-            <span>Microprocessor Lab Project</span>
+            <span className="font-medium">Microprocessor Lab Project</span>
           </div>
-          <div className="flex items-center gap-4 text-xs font-mono">
-            <span>ESP32 + RPi5 + ML</span>
+          <div className="flex items-center gap-5 text-sm font-mono bg-muted/30 px-5 py-2 rounded-xl border border-border/40">
+            <span className="tracking-wide">ESP32 + RPi5 + ML</span>
             <span className="text-border">·</span>
-            <span className="text-fg-green font-bold">● System Online</span>
+            <span className="text-fg-green font-bold tracking-widest">● SYSTEM ONLINE</span>
           </div>
         </div>
       </footer>
