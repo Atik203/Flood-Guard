@@ -19,12 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <ThemeProvider>
-          <div className="flex min-h-screen bg-background">
-            <AppSidebar />
-            <main className="flex-1 min-w-0 transition-all duration-300">
-              {children}
-            </main>
-          </div>
+          {children}
         </ThemeProvider>
       </body>
     </html>

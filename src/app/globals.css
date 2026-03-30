@@ -267,6 +267,15 @@ body {
   --sidebar-accent-foreground: #E8F4FF;
   --sidebar-border:        rgba(0,200,255,0.1);
   --sidebar-ring:          rgba(0,200,255,0.3);
+
+  /* Brand Colors (Dark Mode) */
+  --color-fg-cyan:         #00C8FF;
+  --color-fg-amber:        #FFAA00;
+  --color-fg-green:        #00E676;
+  --color-fg-red:          #FF4444;
+  --color-fg-purple:       #C084FC;
+  --color-fg-navy:         #0A1929;
+  --color-dark-base:       #07111E;
 }
 
 /* ── FloodGuard: Light theme ─────────────────────────── */
@@ -301,6 +310,15 @@ body {
   --sidebar-accent-foreground: #0B1929;
   --sidebar-border:        rgba(0,100,160,0.1);
   --sidebar-ring:          rgba(0,100,160,0.3);
+
+  /* Brand Colors (Light Mode - enhanced legibility) */
+  --color-fg-cyan:         #007799;
+  --color-fg-amber:        #C26600;
+  --color-fg-green:        #00883A;
+  --color-fg-red:          #CC2222;
+  --color-fg-purple:       #7A22CC;
+  --color-fg-navy:         #F0F5FA;
+  --color-dark-base:       #FFFFFF;
 }
 
 @layer base {
