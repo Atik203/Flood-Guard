@@ -1,11 +1,12 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, TrendingUp, Bell, Cpu, Settings,
-  ChevronLeft, ChevronRight, Waves, Moon, Sun, Wifi, Home
+  ChevronLeft, ChevronRight, Waves, Moon, Sun, Wifi, Home,
+  Menu, X
 } from 'lucide-react';
 import { useTheme } from '@/context/ThemeProvider';
 import { cn } from '@/lib/utils';
@@ -24,24 +25,34 @@ export function AppSidebar() {
   const path = usePathname();
   const { theme, toggleTheme } = useTheme();
   const [collapsed, setCollapsed] = useState(false);
-  const w = collapsed ? 'w-16' : 'w-60';
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  return (
-    <aside
-      style={{ background: 'var(--sidebar, #080F1A)' }}
-      className={cn(
-        'sticky top-0 h-screen flex flex-col shrink-0 transition-all duration-300',
-        'border-r border-border/50',
-        w,
-      )}
-    >
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [path]);
+
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+  }, [mobileMenuOpen]);
+
+  const sidebarWidth = collapsed ? 'w-20' : 'w-72';
+
+  // Desktop Sidebar Content
+  const SidebarContent = ({ isMobile = false }) => (
+    <div className="flex flex-col h-full overflow-hidden">
       {/* Logo */}
-      <div className="flex items-center gap-3 px-4 py-5 border-b border-border/40">
-        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-fg-cyan to-fg-cyan/40 flex items-center justify-center shrink-0 shadow-[0_0_16px_rgba(0,200,255,0.35)]">
-          <Waves size={18} className="text-white dark:text-dark-base" />
+      <div className="flex items-center gap-4 px-5 py-6 border-b border-border/40 shrink-0">
+        <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-fg-cyan to-fg-cyan/40 flex items-center justify-center shrink-0 shadow-[0_0_16px_rgba(0,200,255,0.35)]">
+          <Waves size={20} className="text-white dark:text-dark-base" />
         </div>
         <AnimatePresence>
-          {!collapsed && (
+          {(!collapsed || isMobile) && (
             <motion.div
               initial={{ opacity: 0, x: -6 }}
               animate={{ opacity: 1, x: 0 }}
@@ -49,8 +60,8 @@ export function AppSidebar() {
               transition={{ duration: 0.15 }}
               className="overflow-hidden"
             >
-              <p className="text-sm font-bold text-foreground leading-none">FloodGuard</p>
-              <p className="text-[10px] font-mono text-muted-foreground tracking-widest mt-0.5">IoT MONITOR</p>
+              <p className="text-lg font-bold text-foreground leading-none tracking-wide">FloodGuard</p>
+              <p className="text-xs font-mono text-muted-foreground tracking-[3px] mt-1">IoT MONITOR</p>
             </motion.div>
           )}
         </AnimatePresence>
@@ -58,24 +69,24 @@ export function AppSidebar() {
 
       {/* Status pill */}
       <AnimatePresence>
-        {!collapsed && (
+        {(!collapsed || isMobile) && (
           <motion.div
             initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="mx-3 mt-3 mb-1 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-fg-green/10 border border-fg-green/20"
+            className="mx-4 mt-4 mb-2 flex items-center gap-3 px-4 py-2.5 rounded-xl bg-fg-green/10 border border-fg-green/20"
           >
-            <span className="w-2 h-2 rounded-full bg-fg-green animate-[pulseDot_2s_ease-in-out_infinite] shadow-[0_0_6px_#00E676]" />
-            <span className="text-[10px] font-mono font-bold text-fg-green tracking-wider">SYSTEM ONLINE</span>
-            <Wifi size={11} className="text-fg-green ml-auto" />
+            <span className="w-2.5 h-2.5 rounded-full bg-fg-green animate-pulse-dot shadow-[0_0_6px_#00E676] shrink-0" />
+            <span className="text-xs font-mono font-bold text-fg-green tracking-wider">SYSTEM ONLINE</span>
+            <Wifi size={14} className="text-fg-green ml-auto shrink-0" />
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* Nav */}
-      <nav className="flex-1 px-2 py-2 space-y-0.5 overflow-y-auto overflow-x-hidden">
-        {!collapsed && (
-          <p className="text-[9px] font-mono tracking-[3px] text-muted-foreground uppercase px-3 py-2">
+      <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto overflow-x-hidden">
+        {(!collapsed || isMobile) && (
+          <p className="text-[11px] font-mono tracking-[4px] text-muted-foreground uppercase px-4 py-2 mb-2 font-semibold">
             Navigation
           </p>
         )}
@@ -85,32 +96,32 @@ export function AppSidebar() {
             <Link
               key={href}
               href={href}
-              title={collapsed ? label : undefined}
+              title={collapsed && !isMobile ? label : undefined}
               className={cn(
-                'relative flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 group',
+                'relative flex items-center gap-4 px-4 py-3.5 rounded-xl text-base font-semibold transition-all duration-200 group',
                 active
-                  ? 'bg-fg-cyan/10 text-fg-cyan'
+                  ? 'bg-fg-cyan/15 text-fg-cyan shadow-sm border border-fg-cyan/10'
                   : 'text-muted-foreground hover:bg-accent hover:text-foreground',
               )}
             >
               {active && (
-                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-fg-cyan rounded-r-full shadow-[0_0_8px_#00C8FF]" />
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-fg-cyan rounded-r-full shadow-[0_0_8px_#00C8FF]" />
               )}
-              <Icon size={17} className={cn('flex-shrink-0 transition-transform duration-200', 'group-hover:scale-110')} />
+              <Icon size={20} className={cn('flex-shrink-0 transition-transform duration-200', 'group-hover:scale-110')} />
               <AnimatePresence>
-                {!collapsed && (
+                {(!collapsed || isMobile) && (
                   <motion.span
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="flex-1 truncate"
+                    className="flex-1 truncate tracking-wide"
                   >
                     {label}
                   </motion.span>
                 )}
               </AnimatePresence>
-              {!collapsed && badge && (
-                <Badge className="bg-fg-cyan text-dark-base text-[10px] font-bold px-1.5 py-0 h-4 rounded-full">
+              {(!collapsed || isMobile) && badge && (
+                <Badge className="bg-fg-cyan text-dark-base text-xs font-bold px-2.5 py-0.5 rounded-full shadow-sm ml-auto">
                   {badge}
                 </Badge>
               )}
@@ -120,28 +131,99 @@ export function AppSidebar() {
       </nav>
 
       {/* Bottom */}
-      <div className="px-2 pb-4 pt-2 border-t border-border/40 space-y-1">
+      <div className="px-4 pb-6 pt-4 border-t border-border/40 space-y-3 shrink-0">
         <button
           onClick={toggleTheme}
-          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-all duration-150"
+          className="w-full flex items-center justify-center gap-4 px-4 py-3 rounded-xl border border-border/50 text-base font-medium text-foreground bg-card hover:bg-accent hover:border-fg-cyan/40 hover:text-fg-cyan transition-all duration-200"
           title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
         >
-          {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
-          <AnimatePresence>
-            {!collapsed && (
-              <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-sm">
-                {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
-              </motion.span>
-            )}
-          </AnimatePresence>
+          {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+          {(!collapsed || isMobile) && (
+            <span className="tracking-wide">{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+          )}
         </button>
-        <button
-          onClick={() => setCollapsed(c => !c)}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs text-muted-foreground border border-border/50 hover:bg-accent hover:text-foreground transition-all duration-150"
-        >
-          {collapsed ? <ChevronRight size={14} /> : <><ChevronLeft size={14}/><span>Collapse</span></>}
-        </button>
+        {!isMobile && (
+          <button
+            onClick={() => setCollapsed(c => !c)}
+            className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-muted-foreground bg-muted/40 hover:bg-muted hover:text-foreground transition-all duration-200"
+          >
+            {collapsed ? <ChevronRight size={18} /> : <><ChevronLeft size={18}/><span>Collapse Sidebar</span></>}
+          </button>
+        )}
       </div>
-    </aside>
+    </div>
+  );
+
+  return (
+    <>
+      {/* ─── DESKTOP SIDEBAR ────────────────────────────── */}
+      <aside
+        style={{ background: 'var(--sidebar, #080F1A)' }}
+        className={cn(
+          'hidden md:flex sticky top-0 h-screen flex-col shrink-0 transition-all duration-300 z-40',
+          'border-r border-border/50 shadow-xl',
+          sidebarWidth,
+        )}
+      >
+        <SidebarContent />
+      </aside>
+
+      {/* ─── MOBILE HEADER ────────────────────────────── */}
+      <header 
+        style={{ background: 'var(--sidebar, #080F1A)' }}
+        className="md:hidden sticky top-0 z-40 flex items-center justify-between px-5 py-4 border-b border-border/50 shadow-md">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-fg-cyan to-fg-cyan/40 flex items-center justify-center shrink-0 shadow-[0_0_12px_rgba(0,200,255,0.3)]">
+            <Waves size={18} className="text-white dark:text-dark-base" />
+          </div>
+          <div>
+            <p className="text-base font-bold text-foreground leading-none tracking-wide">FloodGuard</p>
+            <p className="text-[10px] font-mono text-muted-foreground tracking-widest mt-1">IoT MONITOR</p>
+          </div>
+        </div>
+        
+        <button 
+          onClick={() => setMobileMenuOpen(true)}
+          className="p-2.5 rounded-xl bg-muted/50 border border-border text-foreground hover:bg-accent transition-colors"
+        >
+          <Menu size={22} />
+        </button>
+      </header>
+
+      {/* ─── MOBILE FULLSCREEN MENU ───────────────────── */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMobileMenuOpen(false)}
+              className="md:hidden fixed inset-0 bg-background/80 backdrop-blur-sm z-50"
+            />
+            {/* Sliding Menu */}
+            <motion.aside
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              style={{ background: 'var(--sidebar, #080F1A)' }}
+              className="md:hidden fixed inset-y-0 left-0 w-[85vw] max-w-sm flex flex-col z-50 border-r border-border/50 shadow-2xl"
+            >
+              <div className="absolute top-4 right-4">
+                <button 
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="p-2.5 rounded-full bg-muted/50 border border-border text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              <SidebarContent isMobile={true} />
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
+    </>
   );
 }

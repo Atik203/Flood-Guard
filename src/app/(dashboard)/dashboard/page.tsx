@@ -35,20 +35,19 @@ export default function DashboardPage() {
           </h1>
           <p className="text-sm text-muted-foreground mt-1">ESP32 + Raspberry Pi 5 · Real-time sensor monitoring</p>
         </div>
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto mt-4 sm:mt-0">
           {/* Connection status */}
-          <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-mono font-bold bg-fg-green/10 text-fg-green border border-fg-green/25">
-            <span className="w-1.5 h-1.5 rounded-full bg-fg-green animate-[pulseDot_2s_ease-in-out_infinite] shadow-[0_0_5px_#00E676]" />
+          <span className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-mono font-bold bg-fg-green/10 text-fg-green border border-fg-green/25 w-full sm:w-auto justify-center">
+            <span className="w-2 h-2 rounded-full bg-fg-green animate-[pulseDot_2s_ease-in-out_infinite] shadow-[0_0_5px_#00E676]" />
             MQTT ONLINE
           </span>
           {/* Current risk */}
-          <span className={cn('inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-mono font-bold border', RISK_BADGE[risk])}>
-            <span className="w-1.5 h-1.5 rounded-full bg-current" />
+          <span className={cn('inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-mono font-bold border w-full sm:w-auto', RISK_BADGE[risk])}>
+            <span className="w-2 h-2 rounded-full bg-current" />
             {risk} RISK
           </span>
-          {/* Last update */}
-          <span className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
-            <RefreshCw size={10} />
+          <span className="flex items-center gap-2 text-sm font-mono text-muted-foreground w-full sm:w-auto justify-center mt-2 sm:mt-0">
+            <RefreshCw size={14} />
             Updated 8s ago
           </span>
         </div>
@@ -73,7 +72,7 @@ export default function DashboardPage() {
           <SystemHealth status={systemStatus} />
         </div>
         {/* Quick stats */}
-        <div className="lg:col-span-2 grid grid-cols-2 sm:grid-cols-3 gap-4">
+        <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
           {[
             { label: 'ML Predictions Today', value: mlStats.predictions_today.toLocaleString(), color: '#C084FC', sub: 'Decision Tree classifier' },
             { label: 'Model Accuracy',        value: `${mlStats.accuracy}%`,                    color: '#00E676', sub: 'Trained on 2,000 samples' },
@@ -89,9 +88,9 @@ export default function DashboardPage() {
               transition={{ delay: 0.6 + i * 0.06 }}
               className="rounded-2xl bg-card border border-border/50 p-4 hover:border-border transition-all duration-200"
             >
-              <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest mb-1">{s.label}</p>
-              <p className="font-mono text-2xl font-bold" style={{ color: s.color }}>{s.value}</p>
-              <p className="text-[11px] text-muted-foreground mt-1">{s.sub}</p>
+              <p className="text-sm font-mono text-muted-foreground uppercase tracking-widest mb-1 font-bold">{s.label}</p>
+              <p className="font-mono text-4xl font-extrabold" style={{ color: s.color }}>{s.value}</p>
+              <p className="text-sm text-muted-foreground mt-2 leading-tight">{s.sub}</p>
             </motion.div>
           ))}
         </div>

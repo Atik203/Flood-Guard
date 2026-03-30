@@ -11,7 +11,7 @@ function fmtTime(iso: string) {
 }
 function riskBadge(level: string) {
   const map = { LOW: 'bg-fg-green/10 text-fg-green', MEDIUM: 'bg-fg-amber/10 text-fg-amber', HIGH: 'bg-fg-orange/10 text-fg-orange', CRITICAL: 'bg-fg-red/10 text-fg-red badge-critical-pulse' } as any;
-  return `inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-mono font-bold border ${map[level]}`;
+  return `inline-flex items-center px-3 py-1 rounded-xl text-sm font-mono font-bold border shadow-sm ${map[level]}`;
 }
 
 export default function AlertsPage() {
@@ -27,7 +27,7 @@ export default function AlertsPage() {
       </motion.div>
 
       {/* Stats row */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { label: 'Total Alerts', value: alerts.length.toString(),                                      color: '#FF4444' },
           { label: 'CRITICAL',     value: alerts.filter(a => a.risk_level === 'CRITICAL').length.toString(), color: '#FF4444' },
@@ -35,9 +35,9 @@ export default function AlertsPage() {
           { label: 'Resolved',     value: alerts.filter(a => a.risk_level === 'LOW').length.toString(),  color: '#00E676' },
         ].map((s, i) => (
           <motion.div key={s.label} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}
-            className="rounded-2xl bg-card border border-border/50 p-4">
-            <p className="text-[10px] font-mono text-muted-foreground tracking-widest uppercase">{s.label}</p>
-            <p className="font-mono text-3xl font-bold mt-1" style={{ color: s.color }}>{s.value}</p>
+            className="rounded-2xl bg-card border border-border/50 p-5">
+            <p className="text-sm font-mono text-muted-foreground tracking-widest uppercase font-bold">{s.label}</p>
+            <p className="font-mono text-4xl font-extrabold mt-2" style={{ color: s.color }}>{s.value}</p>
           </motion.div>
         ))}
       </div>
@@ -47,11 +47,11 @@ export default function AlertsPage() {
         {/* Alert Feed */}
         <motion.div initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }}>
           <Card className="border-border/50 bg-card h-full">
-            <CardHeader className="pb-2">
-              <p className="text-[9px] font-mono tracking-[3px] text-muted-foreground uppercase">EVENT LOG</p>
-              <CardTitle className="text-base">Alert Feed</CardTitle>
+            <CardHeader className="pb-4">
+              <p className="text-sm font-mono tracking-widest text-muted-foreground uppercase font-bold mb-1">EVENT LOG</p>
+              <CardTitle className="text-xl">Alert Feed</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2 max-h-96 overflow-y-auto pr-1">
+            <CardContent className="space-y-3 max-h-96 overflow-y-auto pr-2">
               {alerts.map((a, i) => (
                 <motion.div
                   key={a.id}
@@ -60,15 +60,15 @@ export default function AlertsPage() {
                   transition={{ delay: 0.35 + i * 0.05 }}
                   className="flex gap-3 p-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors border border-border/30"
                 >
-                  <div className="w-1 rounded-full flex-shrink-0 mt-1" style={{ background: riskColors[a.risk_level as keyof typeof riskColors] }} />
+                  <div className="w-1 rounded-full shrink-0 mt-1" style={{ background: riskColors[a.risk_level as keyof typeof riskColors] }} />
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
+                    <div className="flex flex-wrap items-center gap-2 mb-2">
                       <span className={riskBadge(a.risk_level)}>{a.risk_level}</span>
-                      <span className="text-[10px] font-mono text-muted-foreground">{fmtTime(a.timestamp)}</span>
-                      {a.telegram_sent && <MessageCircle size={11} className="text-fg-purple" />}
+                      <span className="text-sm font-mono text-muted-foreground">{fmtTime(a.timestamp)}</span>
+                      {a.telegram_sent && <MessageCircle size={14} className="text-fg-purple" />}
                     </div>
-                    <p className="text-xs text-foreground font-medium truncate">{a.action}</p>
-                    <p className="text-[10px] font-mono text-muted-foreground mt-0.5">
+                    <p className="text-base text-foreground font-semibold truncate">{a.action}</p>
+                    <p className="text-sm font-mono text-muted-foreground mt-1">
                       💧{a.water_cm}cm · 🌧️{a.rain_intensity}% · 💨{a.flow_lpm}L/min
                     </p>
                   </div>
@@ -81,25 +81,25 @@ export default function AlertsPage() {
         {/* Telegram preview */}
         <motion.div initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.35 }}>
           <Card className="border-border/50 bg-card h-full">
-            <CardHeader className="pb-2">
-              <p className="text-[9px] font-mono tracking-[3px] text-muted-foreground uppercase">NOTIFICATIONS</p>
-              <CardTitle className="text-base flex items-center gap-2">
-                <MessageCircle size={16} className="text-fg-purple" /> Telegram Bot Log
+            <CardHeader className="pb-4">
+              <p className="text-sm font-mono tracking-widest text-muted-foreground uppercase font-bold mb-1">NOTIFICATIONS</p>
+              <CardTitle className="text-xl flex items-center gap-2">
+                <MessageCircle size={20} className="text-fg-purple" /> Telegram Bot Log
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2 max-h-96 overflow-y-auto">
+            <CardContent className="space-y-3 max-h-96 overflow-y-auto pr-2">
               {alerts.filter(a => a.telegram_sent).map((a, i) => (
                 <motion.div
                   key={a.id}
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 + i * 0.06 }}
-                  className="bg-[#17212b] border border-[#2b5278]/40 rounded-2xl p-3 max-w-xs"
+                  className="bg-[#17212b] border border-[#2b5278]/40 rounded-2xl p-4 max-w-[85%]"
                 >
-                  <p className="text-xs text-[#e0e0e0] leading-relaxed whitespace-pre-line">{a.message}</p>
-                  <div className="flex items-center gap-1 mt-2">
-                    <CheckCircle size={10} className="text-[#5b9bd5]" />
-                    <span className="text-[9px] text-[#54708c]">{fmtTime(a.timestamp)} · Delivered</span>
+                  <p className="text-sm text-[#e0e0e0] leading-relaxed whitespace-pre-line">{a.message}</p>
+                  <div className="flex flex-wrap items-center gap-1.5 mt-3 justify-end">
+                    <span className="text-xs text-[#54708c]">{fmtTime(a.timestamp)}</span>
+                    <CheckCircle size={12} className="text-[#5b9bd5] ml-1" />
                   </div>
                 </motion.div>
               ))}
@@ -111,14 +111,14 @@ export default function AlertsPage() {
       {/* Full data log table */}
       <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
         <Card className="border-border/50 bg-card">
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
+          <CardHeader className="pb-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
-                <p className="text-[9px] font-mono tracking-[3px] text-muted-foreground uppercase">SENSOR READINGS</p>
-                <CardTitle className="text-base">Recent Data Log</CardTitle>
+                <p className="text-sm font-mono tracking-widest text-muted-foreground uppercase font-bold mb-1">SENSOR READINGS</p>
+                <CardTitle className="text-xl">Recent Data Log</CardTitle>
               </div>
-              <button className="flex items-center gap-1.5 text-xs text-muted-foreground border border-border/50 px-3 py-1.5 rounded-lg hover:bg-muted/50 transition-colors font-mono">
-                <Download size={12} /> Export CSV
+              <button className="flex items-center gap-2 text-sm text-foreground bg-muted/50 border border-border/50 px-4 py-2 rounded-xl hover:bg-muted font-bold transition-colors w-full sm:w-auto shadow-sm">
+                <Download size={16} /> Export CSV
               </button>
             </div>
           </CardHeader>
@@ -127,24 +127,24 @@ export default function AlertsPage() {
               <TableHeader>
                 <TableRow className="border-border/40 hover:bg-transparent">
                   {['Timestamp','Water (cm)','Rain (%)','Flow (L/min)','Temp (°C)','Humidity (%)','Risk','Gate'].map(h => (
-                    <TableHead key={h} className="font-mono text-[10px] tracking-wider uppercase text-muted-foreground">{h}</TableHead>
+                    <TableHead key={h} className="font-mono text-sm tracking-wider font-bold uppercase text-muted-foreground whitespace-nowrap px-4 py-3">{h}</TableHead>
                   ))}
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {recentReadings.reverse().map((r, i) => (
                   <TableRow key={r.id} className="border-border/30 hover:bg-muted/30 transition-colors">
-                    <TableCell className="font-mono text-[11px] text-muted-foreground whitespace-nowrap">{fmtTime(r.timestamp)}</TableCell>
-                    <TableCell className="font-mono text-sm font-bold text-fg-cyan">{r.water_cm}</TableCell>
-                    <TableCell className="font-mono text-sm text-fg-purple">{r.rain_intensity}%</TableCell>
-                    <TableCell className="font-mono text-sm text-fg-green">{r.flow_lpm}</TableCell>
-                    <TableCell className="font-mono text-sm text-fg-amber">{r.temperature}°</TableCell>
-                    <TableCell className="font-mono text-sm text-muted-foreground">{r.humidity}%</TableCell>
-                    <TableCell>
+                    <TableCell className="font-mono text-sm text-muted-foreground whitespace-nowrap px-4 py-3">{fmtTime(r.timestamp)}</TableCell>
+                    <TableCell className="font-mono text-base font-bold text-fg-cyan px-4 py-3">{r.water_cm}</TableCell>
+                    <TableCell className="font-mono text-base font-medium text-fg-purple px-4 py-3">{r.rain_intensity}%</TableCell>
+                    <TableCell className="font-mono text-base font-medium text-fg-green px-4 py-3">{r.flow_lpm}</TableCell>
+                    <TableCell className="font-mono text-base font-medium text-fg-amber px-4 py-3">{r.temperature}°</TableCell>
+                    <TableCell className="font-mono text-base font-medium text-muted-foreground px-4 py-3">{r.humidity}%</TableCell>
+                    <TableCell className="px-4 py-3">
                       <span className={riskBadge(r.risk_level)}>{r.risk_level}</span>
                     </TableCell>
-                    <TableCell>
-                      <span className={`text-[10px] font-mono font-bold ${r.gate_open ? 'text-fg-green' : 'text-fg-red'}`}>
+                    <TableCell className="px-4 py-3">
+                      <span className={`text-sm font-mono font-bold ${r.gate_open ? 'text-fg-green' : 'text-fg-red'}`}>
                         {r.gate_open ? '⚙️ OPEN' : '🔒 CLOSED'}
                       </span>
                     </TableCell>

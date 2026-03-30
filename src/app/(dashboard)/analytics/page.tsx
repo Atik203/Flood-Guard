@@ -54,7 +54,7 @@ export default function AnalyticsPage() {
       </motion.div>
 
       {/* Model KPIs */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         {[
           { label: 'Accuracy',          value: `${mlStats.accuracy}%`,               color: '#00E676' },
           { label: 'Training Samples',  value: mlStats.training_samples.toLocaleString(), color: '#00C8FF' },
@@ -62,9 +62,9 @@ export default function AnalyticsPage() {
           { label: 'Features Used',     value: mlStats.features.length.toString(),    color: '#FFAA00' },
         ].map((s, i) => (
           <motion.div key={s.label} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}
-            className="rounded-2xl bg-card border border-border/50 p-4">
-            <p className="text-[10px] font-mono text-muted-foreground tracking-widest uppercase">{s.label}</p>
-            <p className="font-mono text-3xl font-bold mt-1" style={{ color: s.color }}>{s.value}</p>
+            className="rounded-2xl bg-card border border-border/50 p-5">
+            <p className="text-sm font-mono text-muted-foreground tracking-widest uppercase font-bold">{s.label}</p>
+            <p className="font-mono text-4xl font-extrabold mt-2" style={{ color: s.color }}>{s.value}</p>
           </motion.div>
         ))}
       </div>
@@ -72,11 +72,11 @@ export default function AnalyticsPage() {
       {/* Multi-sensor chart */}
       <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
         <Card className="border-border/50 bg-card">
-          <CardHeader className="pb-2">
-            <p className="text-[9px] font-mono tracking-[3px] text-muted-foreground uppercase">SENSOR CORRELATION — LAST 12H</p>
-            <CardTitle className="text-base">All Sensors Overlaid</CardTitle>
+          <CardHeader className="pb-4">
+            <p className="text-sm font-mono tracking-widest text-muted-foreground uppercase mb-1 font-bold">SENSOR CORRELATION — LAST 12H</p>
+            <CardTitle className="text-xl">All Sensors Overlaid</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-0 sm:px-6">
             <ResponsiveContainer width="100%" height={280}>
               <LineChart data={chart} margin={{ top: 8, right: 10, bottom: 0, left: -10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,200,255,0.06)" />
@@ -99,11 +99,11 @@ export default function AnalyticsPage() {
         {/* Risk distribution bar */}
         <motion.div initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 }}>
           <Card className="border-border/50 bg-card h-full">
-            <CardHeader className="pb-2">
-              <p className="text-[9px] font-mono tracking-[3px] text-muted-foreground uppercase">RISK DISTRIBUTION</p>
-              <CardTitle className="text-base">Prediction Counts (24h)</CardTitle>
+            <CardHeader className="pb-4">
+              <p className="text-sm font-mono tracking-widest text-muted-foreground uppercase font-bold mb-1">RISK DISTRIBUTION</p>
+              <CardTitle className="text-xl">Prediction Counts (24h)</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-1 sm:px-6">
               <ResponsiveContainer width="100%" height={200}>
                 <BarChart data={riskDist} margin={{ top: 8, right: 8, bottom: 0, left: -16 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,200,255,0.06)" vertical={false} />
@@ -124,18 +124,18 @@ export default function AnalyticsPage() {
         {/* Feature importance */}
         <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}>
           <Card className="border-border/50 bg-card h-full">
-            <CardHeader className="pb-2">
-              <p className="text-[9px] font-mono tracking-[3px] text-muted-foreground uppercase">MODEL INTERNALS</p>
-              <CardTitle className="text-base">Feature Importance</CardTitle>
+            <CardHeader className="pb-4">
+              <p className="text-sm font-mono tracking-widest text-muted-foreground uppercase font-bold mb-1">MODEL INTERNALS</p>
+              <CardTitle className="text-xl">Feature Importance</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3 pt-2">
+            <CardContent className="space-y-4 pt-2">
               {mlStats.feature_importance.map((f, i) => (
                 <div key={f.feature}>
-                  <div className="flex justify-between text-xs mb-1">
-                    <span className="font-mono text-muted-foreground">{f.feature}</span>
+                  <div className="flex justify-between text-base mb-2">
+                    <span className="font-mono text-muted-foreground font-medium">{f.feature}</span>
                     <span className="font-mono font-bold text-foreground">{(f.importance * 100).toFixed(0)}%</span>
                   </div>
-                  <div className="h-2 rounded-full bg-muted overflow-hidden">
+                  <div className="h-3 rounded-full bg-muted overflow-hidden">
                     <motion.div
                       className="h-full rounded-full"
                       style={{ background: ['#00C8FF','#C084FC','#FFAA00','#00E676'][i] }}
@@ -146,9 +146,9 @@ export default function AnalyticsPage() {
                   </div>
                 </div>
               ))}
-              <div className="pt-2 border-t border-border/40">
-                <p className="text-[10px] font-mono text-muted-foreground">Model: {mlStats.model_type}</p>
-                <p className="text-[10px] font-mono text-muted-foreground mt-0.5">Last trained: {new Date(mlStats.last_trained).toLocaleDateString()}</p>
+              <div className="pt-4 mt-2 border-t border-border/40 space-y-1">
+                <p className="text-sm font-mono text-muted-foreground">Model: <span className="text-foreground">{mlStats.model_type}</span></p>
+                <p className="text-sm font-mono text-muted-foreground">Last trained: <span className="text-foreground">{new Date(mlStats.last_trained).toLocaleDateString()}</span></p>
               </div>
             </CardContent>
           </Card>
@@ -157,13 +157,13 @@ export default function AnalyticsPage() {
         {/* Confusion matrix */}
         <motion.div initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 }}>
           <Card className="border-border/50 bg-card h-full">
-            <CardHeader className="pb-2">
-              <p className="text-[9px] font-mono tracking-[3px] text-muted-foreground uppercase">ACCURACY BREAKDOWN</p>
-              <CardTitle className="text-base">Confusion Matrix</CardTitle>
+            <CardHeader className="pb-4">
+              <p className="text-sm font-mono tracking-widest text-muted-foreground uppercase font-bold mb-1">ACCURACY BREAKDOWN</p>
+              <CardTitle className="text-xl">Confusion Matrix</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="overflow-x-auto">
-                <table className="text-[11px] font-mono w-full">
+            <CardContent className="px-2 sm:px-6">
+              <div className="overflow-x-auto pb-2">
+                <table className="text-sm font-mono w-full min-w-[300px]">
                   <thead>
                     <tr>
                       <th className="text-left text-muted-foreground pb-2 pr-2">Pred →</th>
@@ -175,8 +175,8 @@ export default function AnalyticsPage() {
                       <tr key={ri}>
                         <td className="text-muted-foreground pr-2 py-1">{labels[ri]}</td>
                         {row.map((val, ci) => (
-                          <td key={ci} className="text-center px-2 py-1 rounded">
-                            <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-bold ${ri === ci
+                          <td key={ci} className="text-center px-3 py-2 rounded">
+                            <span className={`inline-block px-2.5 py-1 rounded text-sm font-bold ${ri === ci
                               ? 'bg-fg-green/15 text-fg-green' : val > 0 ? 'bg-fg-red/10 text-fg-red' : 'text-muted-foreground'}`}>
                               {val}
                             </span>
@@ -187,7 +187,7 @@ export default function AnalyticsPage() {
                   </tbody>
                 </table>
               </div>
-              <p className="text-[10px] text-muted-foreground mt-3 font-mono">Overall accuracy: <span className="text-fg-green font-bold">{mlStats.accuracy}%</span></p>
+              <p className="text-sm text-muted-foreground mt-4 font-mono font-medium tracking-wide">Overall accuracy: <span className="text-fg-green font-bold text-base">{mlStats.accuracy}%</span></p>
             </CardContent>
           </Card>
         </motion.div>
