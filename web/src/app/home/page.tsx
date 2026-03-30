@@ -6,7 +6,7 @@ import {
   Waves, Cpu, Brain, Bell, Shield, Activity,
   ArrowRight, ChevronDown, Wifi, Database, Zap,
   BarChart3, MessageCircle, Droplets, CloudRain, Wind, Thermometer,
-  CheckCircle, Github, Globe, BookOpen,
+  CheckCircle, Globe, BookOpen,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
