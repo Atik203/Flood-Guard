@@ -134,103 +134,105 @@ function ArchFlowTab() {
   );
 }
 
-// ─── Physical View ────────────────────────────────────────────────────────────
+// ─── Component Map ────────────────────────────────────────────────────────────
 function PhysicalTab() {
+  const COMPS_INSIDE = [
+    { name: 'Raspberry Pi 5', icon: '🍓', color: 'text-fg-amber', bg: 'bg-fg-amber/10', border: 'border-fg-amber/30', desc: 'Central Brain (ML + API + Web)' },
+    { name: 'ESP32 WROOM-32', icon: '🔲', color: 'text-fg-cyan', bg: 'bg-fg-cyan/10', border: 'border-fg-cyan/30', desc: 'Edge Node (Sensors & MQTT)' },
+    { name: 'L298N Driver', icon: '⚡', color: 'text-fg-purple', bg: 'bg-fg-purple/10', border: 'border-fg-purple/30', desc: 'Motor Power Controller' },
+    { name: 'Power Supply', icon: '🔌', color: 'text-foreground', bg: 'bg-muted/50', border: 'border-border/60', desc: '5V/3A & 5V/5A step-downs' },
+    { name: 'OLED SSD1306', icon: '🖥️', color: 'text-fg-cyan', bg: 'bg-fg-cyan/10', border: 'border-fg-cyan/30', desc: 'Dashboard inside lid' },
+    { name: 'Active Buzzer', icon: '🔔', color: 'text-fg-red', bg: 'bg-fg-red/10', border: 'border-fg-red/30', desc: 'Local alarm sound' },
+  ];
+  
+  const COMPS_OUTSIDE = [
+    { name: 'HC-SR04', icon: '📡', color: 'text-fg-cyan', bg: 'bg-fg-cyan/10', border: 'border-fg-cyan/30', desc: 'Ultrasonic distance' },
+    { name: 'YL-83 Rain', icon: '🌧️', color: 'text-fg-cyan', bg: 'bg-fg-cyan/10', border: 'border-fg-cyan/30', desc: 'Rain drop detection' },
+    { name: 'YF-S201 Flow', icon: '💧', color: 'text-fg-cyan', bg: 'bg-fg-cyan/10', border: 'border-fg-cyan/30', desc: 'Flow rate counter' },
+    { name: 'DHT22', icon: '🌡️', color: 'text-fg-amber', bg: 'bg-fg-amber/10', border: 'border-fg-amber/30', desc: 'Temperature & Humidity' },
+    { name: 'Servo Motor', icon: '⚙️', color: 'text-fg-green', bg: 'bg-fg-green/10', border: 'border-fg-green/30', desc: 'Drain gate actuation' },
+  ];
+
   return (
-    <div className="space-y-6">
-      <div className="relative rounded-xl border-2 border-dashed border-fg-cyan/20 bg-card p-4">
-        <p className="absolute -top-[10px] left-4 text-[8px] font-mono tracking-[2px] text-fg-cyan bg-background px-2">PROJECT BOX — TOP VIEW (500mm × 350mm)</p>
-        <svg viewBox="0 0 660 420" className="w-full max-h-96">
-          <defs>
-            <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-              <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </marker>
-          </defs>
-          {/* Outer box */}
-          <rect x="20" y="20" width="620" height="380" rx="16" fill="none" stroke="rgba(0,200,255,0.25)" strokeWidth="1.5" strokeDasharray="8 4"/>
-          {/* Water channel */}
-          <rect x="20" y="140" width="80" height="140" rx="6" fill="rgba(0,60,100,0.4)" stroke="rgba(0,200,255,0.4)" strokeWidth="1.5" strokeDasharray="5 3"/>
-          <text x="60" y="202" textAnchor="middle" fontFamily="JetBrains Mono" fontSize="9" fill="#00C8FF">WATER</text>
-          <text x="60" y="216" textAnchor="middle" fontFamily="JetBrains Mono" fontSize="9" fill="#00C8FF">CHANNEL</text>
-          {/* HC-SR04 */}
-          <rect x="76" y="155" width="70" height="48" rx="5" fill="rgba(0,200,255,0.08)" stroke="rgba(0,200,255,0.5)" strokeWidth="1.5"/>
-          <text x="111" y="175" textAnchor="middle" fontFamily="JetBrains Mono" fontSize="9" fontWeight="700" fill="#00C8FF">HC-SR04</text>
-          <text x="111" y="193" textAnchor="middle" fontFamily="JetBrains Mono" fontSize="8" fill="rgba(0,200,255,0.6)">Ultrasonic</text>
-          {/* YF-S201 */}
-          <rect x="76" y="218" width="70" height="48" rx="5" fill="rgba(0,200,255,0.08)" stroke="rgba(0,200,255,0.5)" strokeWidth="1.5"/>
-          <text x="111" y="238" textAnchor="middle" fontFamily="JetBrains Mono" fontSize="9" fontWeight="700" fill="#00C8FF">YF-S201</text>
-          <text x="111" y="256" textAnchor="middle" fontFamily="JetBrains Mono" fontSize="8" fill="rgba(0,200,255,0.6)">Flow Sensor</text>
-          {/* Rain sensor */}
-          <rect x="250" y="22" width="80" height="44" rx="5" fill="rgba(0,200,255,0.08)" stroke="rgba(0,200,255,0.5)" strokeWidth="1.5"/>
-          <text x="290" y="41" textAnchor="middle" fontFamily="JetBrains Mono" fontSize="9" fontWeight="700" fill="#00C8FF">YL-83</text>
-          <text x="290" y="56" textAnchor="middle" fontFamily="JetBrains Mono" fontSize="8" fill="rgba(0,200,255,0.6)">Rain Sensor</text>
-          {/* Motor */}
-          <rect x="200" y="340" width="100" height="50" rx="5" fill="rgba(0,230,118,0.07)" stroke="rgba(0,230,118,0.4)" strokeWidth="1.5"/>
-          <text x="250" y="360" textAnchor="middle" fontFamily="JetBrains Mono" fontSize="9" fontWeight="700" fill="#00E676">SERVO MOTOR</text>
-          <text x="250" y="380" textAnchor="middle" fontFamily="JetBrains Mono" fontSize="8" fill="rgba(0,230,118,0.6)">Drain Gate</text>
-          {/* L298N */}
-          <rect x="170" y="250" width="120" height="70" rx="5" fill="rgba(255,170,0,0.05)" stroke="rgba(255,170,0,0.35)" strokeWidth="1.5"/>
-          <text x="230" y="278" textAnchor="middle" fontFamily="JetBrains Mono" fontSize="9" fontWeight="700" fill="#FFAA00">L298N DRIVER</text>
-          <text x="230" y="308" textAnchor="middle" fontFamily="JetBrains Mono" fontSize="8" fill="rgba(255,170,0,0.6)">+ Breadboard</text>
-          {/* ESP32 */}
-          <rect x="320" y="240" width="120" height="80" rx="6" fill="rgba(0,200,255,0.08)" stroke="rgba(0,200,255,0.6)" strokeWidth="2"/>
-          <text x="380" y="268" textAnchor="middle" fontFamily="JetBrains Mono" fontSize="10" fontWeight="700" fill="#00C8FF">ESP32</text>
-          <text x="380" y="284" textAnchor="middle" fontFamily="JetBrains Mono" fontSize="8" fill="rgba(0,200,255,0.7)">WROOM-32</text>
-          <text x="380" y="308" textAnchor="middle" fontFamily="JetBrains Mono" fontSize="8" fill="rgba(0,200,255,0.5)">Wi-Fi MQTT</text>
-          {/* OLED */}
-          <rect x="460" y="260" width="75" height="50" rx="5" fill="rgba(0,200,255,0.06)" stroke="rgba(0,200,255,0.3)" strokeWidth="1"/>
-          <text x="497" y="281" textAnchor="middle" fontFamily="JetBrains Mono" fontSize="9" fontWeight="700" fill="#00C8FF">OLED</text>
-          <text x="497" y="300" textAnchor="middle" fontFamily="JetBrains Mono" fontSize="8" fill="rgba(0,200,255,0.5)">I2C SSD1306</text>
-          {/* Buzzer */}
-          <rect x="460" y="200" width="60" height="45" rx="5" fill="rgba(255,68,68,0.06)" stroke="rgba(255,68,68,0.3)" strokeWidth="1"/>
-          <text x="490" y="220" textAnchor="middle" fontFamily="JetBrains Mono" fontSize="9" fontWeight="700" fill="#FF4444">BUZZER</text>
-          <text x="490" y="238" textAnchor="middle" fontFamily="JetBrains Mono" fontSize="8" fill="rgba(255,68,68,0.5)">Active Alert</text>
-          {/* Raspberry Pi 5 */}
-          <rect x="310" y="60" width="170" height="140" rx="8" fill="rgba(255,170,0,0.07)" stroke="rgba(255,170,0,0.6)" strokeWidth="2"/>
-          <text x="395" y="90" textAnchor="middle" fontFamily="JetBrains Mono" fontSize="11" fontWeight="700" fill="#FFAA00">RASPBERRY PI 5</text>
-          <text x="395" y="108" textAnchor="middle" fontFamily="JetBrains Mono" fontSize="8" fill="rgba(255,170,0,0.7)">BCM2712 · 8GB LPDDR4X</text>
-          <text x="395" y="128" textAnchor="middle" fontFamily="JetBrains Mono" fontSize="8" fill="rgba(255,170,0,0.6)">Python ML + Flask</text>
-          <text x="395" y="148" textAnchor="middle" fontFamily="JetBrains Mono" fontSize="8" fill="rgba(255,170,0,0.6)">MQTT Broker</text>
-          <text x="395" y="168" textAnchor="middle" fontFamily="JetBrains Mono" fontSize="8" fill="rgba(255,170,0,0.5)">SQLite + Telegram</text>
-          {/* Power supply */}
-          <rect x="530" y="60" width="90" height="60" rx="5" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.2)" strokeWidth="1"/>
-          <text x="575" y="84" textAnchor="middle" fontFamily="JetBrains Mono" fontSize="9" fontWeight="700" fill="rgba(255,255,255,0.7)">POWER</text>
-          <text x="575" y="100" textAnchor="middle" fontFamily="JetBrains Mono" fontSize="8" fill="rgba(255,255,255,0.4)">5V/3A + 5V/5A</text>
-          {/* MicroSD */}
-          <rect x="530" y="140" width="90" height="45" rx="5" fill="rgba(192,132,252,0.06)" stroke="rgba(192,132,252,0.25)" strokeWidth="1"/>
-          <text x="575" y="158" textAnchor="middle" fontFamily="JetBrains Mono" fontSize="9" fontWeight="700" fill="#C084FC">microSD</text>
-          <text x="575" y="174" textAnchor="middle" fontFamily="JetBrains Mono" fontSize="8" fill="rgba(192,132,252,0.5)">32GB OS + data</text>
-          {/* Connection lines */}
-          <line x1="146" y1="179" x2="320" y2="280" stroke="rgba(0,200,255,0.5)" strokeWidth="1.5" strokeDasharray="4 3" markerEnd="url(#arr)"/>
-          <line x1="146" y1="242" x2="285" y2="278" stroke="rgba(0,200,255,0.5)" strokeWidth="1.5" strokeDasharray="4 3" markerEnd="url(#arr)"/>
-          <line x1="290" y1="66" x2="350" y2="240" stroke="rgba(0,200,255,0.5)" strokeWidth="1.5" strokeDasharray="4 3" markerEnd="url(#arr)"/>
-          <line x1="320" y1="290" x2="290" y2="285" stroke="rgba(0,230,118,0.6)" strokeWidth="1.5" markerEnd="url(#arr)"/>
-          <line x1="230" y1="320" x2="240" y2="340" stroke="rgba(0,230,118,0.6)" strokeWidth="1.5" markerEnd="url(#arr)"/>
-          <line x1="440" y1="270" x2="460" y2="275" stroke="rgba(192,132,252,0.6)" strokeWidth="1.5" markerEnd="url(#arr)"/>
-          <line x1="440" y1="252" x2="460" y2="230" stroke="rgba(255,68,68,0.6)" strokeWidth="1.5" markerEnd="url(#arr)"/>
-          <path d="M380 240 Q380 200 395 200" fill="none" stroke="rgba(255,170,0,0.7)" strokeWidth="2" strokeDasharray="5 3" markerEnd="url(#arr)"/>
-          <text x="342" y="218" fontFamily="JetBrains Mono" fontSize="8" fill="rgba(255,170,0,0.6)">Wi-Fi MQTT</text>
-        </svg>
+    <div className="space-y-8">
+      {/* Component Map */}
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+        {/* Enclosure */}
+        <div className="xl:col-span-8 space-y-4">
+          <div className="flex items-center justify-between border-b border-border/50 pb-2">
+            <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+              <div className="w-2.5 h-2.5 rounded-full bg-fg-amber" /> Protected Enclosure
+            </h3>
+            <span className="text-[10px] font-mono tracking-widest text-muted-foreground uppercase hidden sm:block">Project Box</span>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-5 rounded-3xl border-2 border-dashed border-border/50 bg-muted/20 relative">
+            <div className="absolute inset-0 bg-fg-amber/[0.01] pointer-events-none rounded-3xl" />
+            {COMPS_INSIDE.map((c, i) => (
+              <motion.div key={c.name} initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }} transition={{ delay: i*0.05 }}
+                className={`flex items-start gap-4 p-4 rounded-xl border ${c.border} bg-card hover:-translate-y-1 transition-transform shadow-sm relative z-10`}>
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0 ${c.bg}`}>{c.icon}</div>
+                <div>
+                  <p className={`font-mono font-bold text-sm ${c.color}`}>{c.name}</p>
+                  <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{c.desc}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        {/* External */}
+        <div className="xl:col-span-4 space-y-4">
+          <div className="flex items-center justify-between border-b border-border/50 pb-2">
+            <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+              <div className="w-2.5 h-2.5 rounded-full bg-fg-cyan" /> Exposed Environment
+            </h3>
+            <span className="text-[10px] font-mono tracking-widest text-muted-foreground uppercase hidden sm:block">External</span>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-3">
+             {COMPS_OUTSIDE.map((c, i) => (
+              <motion.div key={c.name} initial={{ opacity:0, x:10 }} animate={{ opacity:1, x:0 }} transition={{ delay: i*0.06 }}
+                className={`flex items-center gap-3 p-3 rounded-xl border ${c.border} bg-card hover:-translate-y-1 transition-transform shadow-sm`}>
+                <div className={`w-11 h-11 rounded-lg flex items-center justify-center text-xl shrink-0 ${c.bg}`}>{c.icon}</div>
+                <div>
+                  <p className={`font-mono font-bold text-[13px] ${c.color}`}>{c.name}</p>
+                  <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">{c.desc}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Mounting guide */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Card className="border-fg-cyan/25 bg-card">
-          <CardHeader className="pb-2"><CardTitle className="text-sm text-fg-cyan">🌧️ Outside Box (Exposed)</CardTitle></CardHeader>
-          <CardContent className="space-y-1.5">
-            {['HC-SR04 — mount facing down into water channel, seal with silicone', 'YL-83 Rain — mount on slanted bracket on box top lid, facing sky', 'YF-S201 — inline on drain pipe fitting, use pipe thread adapter', 'Servo motor — attach to drain gate flap with mechanical arm bracket'].map(t => (
-              <div key={t} className="flex items-start gap-2 text-xs text-muted-foreground">
-                <span className="text-fg-cyan mt-0.5">▸</span>{t}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4">
+        <Card className="border-fg-cyan/25 bg-card/60">
+          <CardHeader className="pb-3 border-b border-border/40 mb-3"><CardTitle className="text-sm text-fg-cyan font-bold flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-fg-cyan" /> Outside Box Guidelines</CardTitle></CardHeader>
+          <CardContent className="space-y-2">
+            {[
+              'Mount HC-SR04 facing down into channel, seal edges with silicone.',
+              'YL-83 Rain sensor on slanted bracket facing sky on lid.',
+              'YF-S201 flow meter inline on drain pipe fitting.',
+              'Servo attached to drain gate flap via mechanical arm.'
+            ].map(t => (
+              <div key={t} className="flex items-start gap-2.5 text-xs text-muted-foreground">
+                <span className="text-fg-cyan mt-0.5 shrink-0">▸</span><span className="leading-relaxed">{t}</span>
               </div>
             ))}
           </CardContent>
         </Card>
-        <Card className="border-fg-amber/25 bg-card">
-          <CardHeader className="pb-2"><CardTitle className="text-sm text-fg-amber">🔒 Inside Box (Protected)</CardTitle></CardHeader>
-          <CardContent className="space-y-1.5">
-            {['Raspberry Pi 5 — M2.5 standoff screws, top-left area, near Wi-Fi antenna', 'ESP32 — on breadboard, center, all wire runs short', 'L298N driver — right of breadboard, close to servo power', 'OLED display — panel-mounted on box front face, I2C wires inside', 'Buzzer — panel-mounted hole, front face, one wire pair to ESP32'].map(t => (
-              <div key={t} className="flex items-start gap-2 text-xs text-muted-foreground">
-                <span className="text-fg-amber mt-0.5">▸</span>{t}
+        <Card className="border-fg-amber/25 bg-card/60">
+          <CardHeader className="pb-3 border-b border-border/40 mb-3"><CardTitle className="text-sm text-fg-amber font-bold flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-fg-amber" /> Inside Box Guidelines</CardTitle></CardHeader>
+          <CardContent className="space-y-2">
+            {[
+              'Raspberry Pi 5 on M2.5 standoffs near Wi-Fi antenna zone.',
+              'ESP32 centered on breadboard, bridging local sensors.',
+              'L298N driver isolated from logic circuits to reduce EMI.',
+              'OLED display and active buzzer panel-mounted on front face.'
+            ].map(t => (
+              <div key={t} className="flex items-start gap-2.5 text-xs text-muted-foreground">
+                <span className="text-fg-amber mt-0.5 shrink-0">▸</span><span className="leading-relaxed">{t}</span>
               </div>
             ))}
           </CardContent>
@@ -387,7 +389,7 @@ export default function ArchitecturePage() {
         <TabsList className="bg-muted/50 border border-border/50 h-auto p-1 flex-wrap gap-1">
           {[
             { value:'flow',     label:'Architecture Flow' },
-            { value:'physical', label:'Top-Down View'      },
+            { value:'physical', label:'Component Map'      },
             { value:'steps',    label:'Build Steps'        },
             { value:'pins',     label:'Pin Map'            },
           ].map(t => (

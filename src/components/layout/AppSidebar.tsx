@@ -5,18 +5,19 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, TrendingUp, Bell, Cpu, Settings,
-  ChevronLeft, ChevronRight, Waves, Moon, Sun, Wifi,
+  ChevronLeft, ChevronRight, Waves, Moon, Sun, Wifi, Home
 } from 'lucide-react';
 import { useTheme } from '@/context/ThemeProvider';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 
 const NAV = [
-  { href: '/',              icon: LayoutDashboard, label: 'Dashboard',    badge: null },
-  { href: '/analytics',    icon: TrendingUp,      label: 'Analytics',    badge: null },
-  { href: '/alerts',       icon: Bell,            label: 'Alerts',       badge: '8'  },
-  { href: '/architecture', icon: Cpu,             label: 'Architecture', badge: null },
-  { href: '/settings',     icon: Settings,        label: 'Settings',     badge: null },
+  { href: '/',              icon: Home,           label: 'Home',         badge: null },
+  { href: '/dashboard',     icon: LayoutDashboard,label: 'Dashboard',    badge: null },
+  { href: '/analytics',     icon: TrendingUp,     label: 'Analytics',    badge: null },
+  { href: '/alerts',        icon: Bell,           label: 'Alerts',       badge: '8'  },
+  { href: '/architecture',  icon: Cpu,            label: 'Architecture', badge: null },
+  { href: '/settings',      icon: Settings,       label: 'Settings',     badge: null },
 ];
 
 export function AppSidebar() {
@@ -27,17 +28,17 @@ export function AppSidebar() {
 
   return (
     <aside
-      style={{ background: 'var(--sidebar-bg, #080F1A)' }}
+      style={{ background: 'var(--sidebar, #080F1A)' }}
       className={cn(
-        'sticky top-0 h-screen flex flex-col flex-shrink-0 transition-all duration-300',
+        'sticky top-0 h-screen flex flex-col shrink-0 transition-all duration-300',
         'border-r border-border/50',
         w,
       )}
     >
       {/* Logo */}
       <div className="flex items-center gap-3 px-4 py-5 border-b border-border/40">
-        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-fg-cyan to-fg-cyan/40 flex items-center justify-center flex-shrink-0 shadow-[0_0_16px_rgba(0,200,255,0.35)]">
-          <Waves size={18} className="text-dark-base" />
+        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-fg-cyan to-fg-cyan/40 flex items-center justify-center shrink-0 shadow-[0_0_16px_rgba(0,200,255,0.35)]">
+          <Waves size={18} className="text-white dark:text-dark-base" />
         </div>
         <AnimatePresence>
           {!collapsed && (

@@ -272,14 +272,14 @@ body {
 /* ── FloodGuard: Light theme ─────────────────────────── */
 [data-theme="light"] {
   --background:            #F0F5FA;
-  --foreground:            #0A1929;
+  --foreground:            #000000;
   --card:                  #FFFFFF;
-  --card-foreground:       #0A1929;
+  --card-foreground:       #000000;
   --popover:               #FFFFFF;
-  --popover-foreground:    #0A1929;
+  --popover-foreground:    #000000;
   --primary:               #0099CC;
   --primary-foreground:    #FFFFFF;
-  --secondary-foreground:  #4A6B8A;
+  --secondary-foreground:  #222222;
   --muted:                 #F8FAFC;
   --muted-foreground:      #8AACC8;
   --accent:                #EEF2F7;
