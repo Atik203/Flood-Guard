@@ -3,7 +3,7 @@ import { SensorReading, Alert, SystemStatus, MLStats, riskColors } from '@/data/
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
-const API_URL = 'http://localhost:8000/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
 export function useFloodBackend() {
   // Fetch current reading (updates rapidly)
