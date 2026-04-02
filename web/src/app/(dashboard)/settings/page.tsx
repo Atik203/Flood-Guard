@@ -1,6 +1,6 @@
 'use client';
 import { motion } from 'framer-motion';
-import { Settings, Moon, Sun, Bell, Sliders } from 'lucide-react';
+import { Settings, Moon, Sun, Bell, Sliders, Database, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useTheme } from '@/context/ThemeProvider';
 import { useState, useEffect } from 'react';
@@ -8,12 +8,13 @@ import { useFloodBackend } from '@/hooks/useBackend';
 
 export default function SettingsPage() {
   const { theme, toggleTheme } = useTheme();
-  const { appSettings, updateSettings, isLoading } = useFloodBackend();
+  const { appSettings, updateSettings, dbStatus, runDbCleanup, isLoading } = useFloodBackend();
 
   const [toggles, setToggles] = useState({
     telegram: true,
     high: true,
-    medium: false
+    medium: false,
+    auto_clean: true,
   });
   
   const [thresholdsState, setThresholdsState] = useState({
@@ -26,6 +27,7 @@ export default function SettingsPage() {
         telegram: appSettings.telegram_alerts,
         high: appSettings.high_alert,
         medium: appSettings.medium_alert,
+        auto_clean: appSettings.auto_cleanup,
       });
       setThresholdsState({
         medium: appSettings.threshold_medium,
@@ -43,6 +45,7 @@ export default function SettingsPage() {
     if (key === 'telegram') updateSettings({ telegram_alerts: newVal });
     if (key === 'high') updateSettings({ high_alert: newVal });
     if (key === 'medium') updateSettings({ medium_alert: newVal });
+    if (key === 'auto_clean') updateSettings({ auto_cleanup: newVal });
   };
 
   const thresholds = [
@@ -138,6 +141,62 @@ export default function SettingsPage() {
                 ))}
               </div>
               <p className="text-xs text-muted-foreground mt-4 font-mono">⚠️ Threshold changes require ML model retraining on Raspberry Pi 5</p>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Database Status */}
+        <motion.div initial={{ opacity:0, y:14 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.3 }} className="lg:col-span-2">
+          <Card className="border-border/50 bg-card">
+            <CardHeader className="pb-2"><p className="text-[9px] font-mono tracking-[3px] text-muted-foreground uppercase mb-1">STORAGE</p><CardTitle className="text-base flex items-center gap-2"><Database size={16}/> Database Usage & Health</CardTitle></CardHeader>
+            <CardContent>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 mb-6 pb-6 border-b border-border/40">
+                <div className="space-y-1 w-full flex-1">
+                  <p className="text-sm font-medium">Automatic Size Cleanup</p>
+                  <p className="text-xs text-muted-foreground max-w-sm">When enabled, the backend drops old simulated data to ensure the free tier Supabase quota (500MB) isn't exhausted. Automatically keeps only the newest 500 rows.</p>
+                </div>
+                <div 
+                    onClick={() => handleToggle('auto_clean')}
+                    className={`w-12 h-6 rounded-full relative cursor-pointer shrink-0 transition-colors ${toggles.auto_clean ? 'bg-fg-cyan' : 'bg-muted'}`}
+                  >
+                  <div className={`w-5 h-5 rounded-full bg-white absolute top-0.5 transition-all ${toggles.auto_clean ? 'right-0.5' : 'left-0.5'}`} />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4 font-mono text-xs">
+                    <div><p className="text-muted-foreground">Provider</p><p className="text-foreground font-bold">{dbStatus?.provider || 'Unknown'}</p></div>
+                    <div><p className="text-muted-foreground">Tier</p><p className="text-foreground font-bold">{dbStatus?.tier || 'Free'}</p></div>
+                    <div><p className="text-muted-foreground">Sensor Rows</p><p className="text-fg-cyan font-bold text-lg">{dbStatus?.sensor_rows?.toLocaleString() || 0} / 500</p></div>
+                    <div><p className="text-muted-foreground">Alert Rows</p><p className="text-fg-orange font-bold text-lg">{dbStatus?.alert_rows?.toLocaleString() || 0} / 100</p></div>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground font-mono text-xs mb-1">Active SQL Tables</p>
+                    <div className="flex flex-wrap gap-2 text-[10px] font-mono">
+                      {dbStatus?.tables?.map((table: string) => <span key={table} className="px-2 py-1 bg-muted border border-border/50 rounded-md text-foreground">{table}</span>)}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="h-full flex flex-col justify-end mt-4 sm:mt-0">
+                  <button 
+                    onClick={() => {
+                        const btn = document.getElementById('wipe-btn');
+                        if (btn) btn.innerHTML = 'Cleaning Supabase...';
+                        runDbCleanup().then(() => {
+                           if (btn) btn.innerHTML = 'Database Optimised ✓';
+                           setTimeout(() => { if (btn) btn.innerHTML = '<span class="flex items-center gap-2"><svg class="w-4 h-4"></svg> Manually Optimize Store to 500 Rows</span>'; }, 2000);
+                        });
+                    }}
+                    id="wipe-btn"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-red-500/30 bg-red-500/10 text-red-500 text-sm font-semibold hover:bg-red-500 hover:text-white transition-colors"
+                  >
+                    <Trash2 size={16} /> Manually Optimize Store to 500 Rows
+                  </button>
+                  <p className="text-center text-[10px] font-mono text-muted-foreground mt-2">DANGER: Drops all excess historical data entries</p>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </motion.div>

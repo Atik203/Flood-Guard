@@ -48,6 +48,7 @@ class SettingsDB(Base):
     telegram_alerts = Column(Boolean, default=True)
     high_alert = Column(Boolean, default=True)
     medium_alert = Column(Boolean, default=False)
+    auto_cleanup = Column(Boolean, default=True)
     threshold_medium = Column(Integer, default=20)
     threshold_high = Column(Integer, default=50)
     threshold_crit = Column(Integer, default=80)

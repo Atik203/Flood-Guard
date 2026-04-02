@@ -24,6 +24,37 @@ export default function AlertsPage() {
 
   const recentReadings = [...sensorTimeline].slice(-20);
 
+  const exportToCSV = () => {
+    if (!sensorTimeline.length) return;
+    
+    const headers = ['Timestamp', 'Water_cm', 'Rain_intensity', 'Flow_lpm', 'Temperature', 'Humidity', 'Risk_Level', 'Gate_Open'];
+    const csvRows = [headers.join(',')];
+    
+    sensorTimeline.forEach(r => {
+      const row = [
+        r.timestamp, // Keep ISO for raw data
+        r.water_cm,
+        r.rain_intensity,
+        r.flow_lpm,
+        r.temperature,
+        r.humidity,
+        r.risk_level,
+        r.gate_open ? 'OPEN' : 'CLOSED'
+      ];
+      csvRows.push(row.join(','));
+    });
+    
+    const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `flood_sensor_log_${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="p-6 space-y-6 min-h-screen">
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
@@ -124,7 +155,10 @@ export default function AlertsPage() {
                 <p className="text-sm font-mono tracking-widest text-muted-foreground uppercase font-bold mb-1">SENSOR READINGS</p>
                 <CardTitle className="text-xl">Recent Data Log</CardTitle>
               </div>
-              <button className="flex items-center gap-2 text-sm text-foreground bg-muted/50 border border-border/50 px-4 py-2 rounded-xl hover:bg-muted font-bold transition-colors w-full sm:w-auto shadow-sm">
+              <button 
+                onClick={exportToCSV}
+                className="flex items-center gap-2 text-sm text-foreground bg-muted/50 border border-border/50 px-4 py-2 rounded-xl hover:bg-muted font-bold transition-colors w-full sm:w-auto shadow-sm active:scale-95"
+              >
                 <Download size={16} /> Export CSV
               </button>
             </div>

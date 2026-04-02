@@ -24,6 +24,19 @@ export function useFloodBackend() {
   // Fetch settings
   const { data: appSettings, mutate: refreshSettings } = useSWR(`${API_URL}/system/settings`, fetcher, { refreshInterval: 10000 });
 
+  // Fetch db status
+  const { data: dbStatus, mutate: refreshDb } = useSWR(`${API_URL}/system/database`, fetcher, { refreshInterval: 15000 });
+
+  const runDbCleanup = async () => {
+    try {
+      await fetch(`${API_URL}/system/database/cleanup`, { method: 'POST' });
+      await refreshDb();
+      refreshSettings(); // optionally ping settings incase it resets cache
+    } catch(e) {
+      console.error(e);
+    }
+  };
+
   const updateSettings = async (updates: any) => {
     try {
       await fetch(`${API_URL}/system/settings`, {
@@ -74,6 +87,8 @@ export function useFloodBackend() {
     mlStats: safeMlStats,
     appSettings,
     updateSettings,
+    dbStatus,
+    runDbCleanup,
     risk,
     gateOperations,
     isLoading,

@@ -114,6 +114,7 @@ class SettingsUpdate(BaseModel):
     telegram_alerts: Optional[bool] = None
     high_alert: Optional[bool] = None
     medium_alert: Optional[bool] = None
+    auto_cleanup: Optional[bool] = None
     threshold_medium: Optional[int] = None
     threshold_high: Optional[int] = None
     threshold_crit: Optional[int] = None
@@ -142,3 +143,28 @@ def update_settings(update: SettingsUpdate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(settings)
     return settings
+
+@app.get("/api/system/database")
+def get_db_status(db: Session = Depends(get_db)):
+    return {
+        "provider": "Supabase PostgreSQL",
+        "tier": "Free (500MB Limit)",
+        "sensor_rows": db.query(models.SensorReadingDB).count(),
+        "alert_rows": db.query(models.AlertDB).count(),
+        "tables": ["sensor_readings", "alerts", "settings", "system_status"]
+    }
+
+@app.post("/api/system/database/cleanup")
+def cleanup_database(db: Session = Depends(get_db)):
+    # Keep newest 500 sensors
+    sensor_keep = db.query(models.SensorReadingDB).order_by(models.SensorReadingDB.id.desc()).offset(499).first()
+    if sensor_keep:
+        db.query(models.SensorReadingDB).filter(models.SensorReadingDB.id < sensor_keep.id).delete()
+        
+    # Keep newest 100 alerts
+    alert_keep = db.query(models.AlertDB).order_by(models.AlertDB.id.desc()).offset(99).first()
+    if alert_keep:
+        db.query(models.AlertDB).filter(models.AlertDB.id < alert_keep.id).delete()
+        
+    db.commit()
+    return {"message": "Database cleaned successfully", "kept": 500}

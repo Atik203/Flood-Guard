@@ -140,6 +140,17 @@ class MQTTService:
                     self.send_telegram(alert.message)
 
             db.commit()
+
+            # Execute automatic memory cleanup safely every ~50th insert if enabled
+            if settings.auto_cleanup and reading.id and reading.id % 50 == 0:
+                sensor_keep = db.query(SensorReadingDB).order_by(SensorReadingDB.id.desc()).offset(499).first()
+                if sensor_keep:
+                    db.query(SensorReadingDB).filter(SensorReadingDB.id < sensor_keep.id).delete()
+                alert_keep = db.query(AlertDB).order_by(AlertDB.id.desc()).offset(99).first()
+                if alert_keep:
+                    db.query(AlertDB).filter(AlertDB.id < alert_keep.id).delete()
+                db.commit()
+
         except Exception as e:
             db.rollback()
             logger.error(f"DB Error: {e}")
