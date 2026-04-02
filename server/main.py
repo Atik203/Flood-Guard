@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 from ml_service import MLService
 from mqtt_service import MQTTService
 import threading
+import os
 from fastapi.middleware.cors import CORSMiddleware
 
 # Create DB tables
@@ -17,9 +18,13 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI(title="FloodGuard Backend API")
 
 # Setup CORS for the dashboard
+frontend_url = os.getenv("FRONTEND_URL", "*")
+origins = [frontend_url] if frontend_url != "*" else ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
