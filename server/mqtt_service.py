@@ -1,4 +1,6 @@
+import os
 import json
+import requests
 import logging
 import paho.mqtt.client as mqtt
 from datetime import datetime, timezone
@@ -135,5 +137,24 @@ class MQTTService:
         self.client.publish(TOPIC_BUZZER_COMMAND, json.dumps({"state": state}))
         
     def send_telegram(self, message: str):
-        # Placeholder for Telegram logic
-        logger.info(f"TELEGRAM SENT: {message}")
+        bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
+        chat_id = os.getenv("TELEGRAM_CHAT_ID")
+        
+        if not bot_token or not chat_id:
+            logger.warning(f"Telegram not configured in .env! Local log only: {message}")
+            return
+            
+        url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+        payload = {
+            "chat_id": chat_id,
+            "text": message
+        }
+        
+        try:
+            response = requests.post(url, json=payload, timeout=5)
+            if response.status_code == 200:
+                logger.info(f"✅ REAL TELEGRAM SENT: {message}")
+            else:
+                logger.error(f"❌ Failed to send Telegram: {response.text}")
+        except Exception as e:
+            logger.error(f"❌ Telegram Request Exception: {e}")
