@@ -86,19 +86,21 @@ export const outputs = [
 
 // ─── ESP32 capabilities ────────────────────────────────────────────────────────
 export const esp32Chips = [
-  'Wi-Fi MQTT', 'I2C OLED', 'PWM Motor', 'ADC Rain', 'GPIO Buzzer', 'UART Backup',
+  'Wi-Fi MQTT', 'I2C OLED', 'Proportional PWM', 'ADC Rain',
+  'GPIO Buzzer', 'Blockage Timer', 'UART Backup', '500ms Poll Loop',
 ];
 
 export const esp32LocalOutputs = [
-  { icon: '⚙️', label: 'Motor Gate', sub: 'PWM via L298N', color: '#00E676' },
+  { icon: '⚙️', label: 'Proportional Gate', sub: 'PWM · angle ∝ water%', color: '#00E676' },
   { icon: '🖥️', label: 'OLED Display', sub: 'I2C · 0x3C', color: '#00C8FF' },
-  { icon: '🔔', label: 'Buzzer', sub: 'GPIO Active', color: '#FF4444' },
+  { icon: '🔔', label: 'Buzzer', sub: 'GPIO Active (CRITICAL)', color: '#FF4444' },
 ];
 
 // ─── Raspberry Pi capabilities ─────────────────────────────────────────────────
 export const piChips = [
   'Python 3.11', 'scikit-learn ML', 'Mosquitto MQTT', 'Next.js Dashboard',
-  'SQLite Logging', 'Telegram Alerts', 'Wi-Fi + Ethernet', 'PCIe 2.0 Slot',
+  'SQLite Logging', 'Telegram Alerts', 'Trend Analyser', 'Preventive Logic',
+  'Wi-Fi + Ethernet', 'PCIe 2.0 Slot',
 ];
 
 // ─── GPIO Pin Map ──────────────────────────────────────────────────────────────
@@ -122,11 +124,12 @@ export const pinMappings: PinMapping[] = [
 
 // ─── Software Port Map ──────────────────────────────────────────────────────────
 export const softwarePorts: SoftwarePort[] = [
-  { service: 'Mosquitto MQTT Broker', port: '1883',                     protocol: 'MQTT TCP',   purpose: 'Receives sensor data from ESP32' },
-  { service: 'Next.js Web Dashboard', port: '3000',                     protocol: 'HTTP',        purpose: 'Browser access: phone, PC on same Wi-Fi' },
-  { service: 'SQLite Database',       port: '/home/pi/flood.db',        protocol: 'FILE',        purpose: 'Stores all sensor readings + predictions' },
-  { service: 'ML Model File',         port: '/home/pi/flood_model.pkl', protocol: 'FILE',        purpose: 'Trained Decision Tree, loaded by MQTT scripts' },
-  { service: 'Telegram Bot API',      port: 'api.telegram.org',         protocol: 'HTTPS POST',  purpose: 'Outbound alerts when risk = HIGH or CRITICAL' },
+  { service: 'Mosquitto MQTT Broker',   port: '1883',                       protocol: 'MQTT TCP',   purpose: 'Receives sensor data from ESP32 every 500ms' },
+  { service: 'Next.js Web Dashboard',   port: '3000',                       protocol: 'HTTP',        purpose: 'Browser access: phone, PC on same Wi-Fi' },
+  { service: 'SQLite Database',         port: '/home/pi/flood.db',          protocol: 'FILE',        purpose: 'Stores all readings, predictions, blockage events' },
+  { service: 'ML Model File',           port: '/home/pi/flood_model.pkl',   protocol: 'FILE',        purpose: 'Decision Tree — classifies risk + sends gate angle command' },
+  { service: 'Trend Buffer (RAM)',       port: '/home/pi/trend_buffer.json', protocol: 'FILE/MEM',   purpose: 'Rolling window of last 10 readings for preventive logic' },
+  { service: 'Telegram Bot API',        port: 'api.telegram.org',           protocol: 'HTTPS POST',  purpose: 'Alerts on CRITICAL risk and BLOCKAGE events' },
 ];
 
 // ─── Build Steps ──────────────────────────────────────────────────────────────
@@ -307,6 +310,89 @@ def send_telegram_alert(risk, data):
   },
   {
     number: '09',
+    phase: 'ESP32 Firmware Phase',
+    phaseColor: '#00C8FF',
+    title: 'Proportional drain control firmware',
+    description: 'Implement proportional servo control on ESP32. Gate angle is directly proportional to water level — not a simple binary open/close.',
+    tasks: [
+      'Read water level every 500ms using HC-SR04 (non-blocking, interrupt-based)',
+      'Convert raw distance_cm to water_percent: (max_distance - distance_cm) / max_distance × 100',
+      'Calculate gate angle: angle = (water_percent / 100) × 180° — clamp to 0°–180°',
+      'Move servo to calculated angle: servo.write(angle) — smooth, proportional actuation',
+      'Also accept ML override from Pi via MQTT (Pi can force specific angles per risk class)',
+    ],
+    code: {
+      language: 'cpp',
+      content: `// ESP32 Proportional Gate Control (500ms loop)
+float water_pct = (MAX_DIST - distance_cm) / MAX_DIST * 100.0;
+int gate_angle  = (int)(water_pct / 100.0 * 180.0);
+gate_angle = constrain(gate_angle, 0, 180);
+servo.write(gate_angle);
+// water at 60% → 108° automatically`,
+    },
+  },
+  {
+    number: '10',
+    phase: 'ESP32 Firmware Phase',
+    phaseColor: '#00C8FF',
+    title: 'Blockage detection logic on ESP32',
+    description: 'When gate is open but flow sensor reads near-zero, wait 5 seconds, then confirm blockage and attempt mechanical flush.',
+    tasks: [
+      'Track gate state (open/closed) and flow_lpm reading simultaneously',
+      'If gate_open AND flow_lpm < 0.5 for > 5000ms → set blockage_confirmed = true',
+      'Mechanical flush: pulse servo 3× (open → close → open) to dislodge debris',
+      'Activate buzzer + display "BLOCKAGE DETECTED" on OLED',
+      'Publish blockage event to MQTT topic flood/blockage so Pi sends Telegram alert',
+    ],
+    code: {
+      language: 'cpp',
+      content: `// Blockage detection (runs in loop every 500ms)
+if (gate_open && flow_lpm < 0.5) {
+  if (millis() - low_flow_start > 5000) {
+    for (int i = 0; i < 3; i++) {  // 3× pulse flush
+      servo.write(0);  delay(300);
+      servo.write(180); delay(300);
+    }
+    buzzer_on(); oled_show("BLOCKAGE DETECTED");
+    mqtt_publish("flood/blockage", "CONFIRMED");
+  }
+} else { low_flow_start = millis(); }`,
+    },
+  },
+  {
+    number: '11',
+    phase: 'Pi 5 Software Phase',
+    phaseColor: '#FFAA00',
+    title: 'Early preventive action — trend analysis on Pi',
+    description: 'Pi tracks last 10 readings and acts pre-emptively when both rain and water level are simultaneously rising — before any threshold is crossed.',
+    tasks: [
+      'Maintain a rolling buffer of last 10 sensor readings (deque in Python)',
+      'After each reading, compute linear regression slope for rain_adc and water_cm',
+      'If both slopes > 0 (both rising simultaneously) → trigger PREVENTIVE mode',
+      'Publish gate_angle=90 to flood/command — opens gate to 50% before threshold hit',
+      'If trend reverses (slope ≤ 0 for either) → revert to proportional control or ML prediction',
+    ],
+    code: {
+      language: 'python',
+      content: `from collections import deque
+import numpy as np
+
+buffer = deque(maxlen=10)
+
+def check_trend(data):
+    buffer.append(data)
+    if len(buffer) < 10: return
+    rain  = np.array([r['rain_adc']  for r in buffer])
+    water = np.array([r['water_cm']  for r in buffer])
+    # Linear regression slope via numpy polyfit
+    rain_slope  = np.polyfit(range(10), rain,  1)[0]
+    water_slope = np.polyfit(range(10), water, 1)[0]
+    if rain_slope > 0 and water_slope > 0:
+        mqtt_publish("flood/command", "ANGLE:90")  # 50% open`,
+    },
+  },
+  {
+    number: '12',
     phase: 'Final Phase',
     phaseColor: '#00E676',
     title: 'Mount in enclosure + demo prep',
@@ -316,7 +402,8 @@ def send_telegram_alert(risk, data):
       'Mount Pi 5 and ESP32 inside box using M2.5 standoffs, OLED on front panel',
       'Waterproof external sensors with silicone sealant around sensor edges (not sensor face)',
       'Demo setup: Small tray of water, HC-SR04 mounted above, YL-83 with spray bottle for rain sim',
-      'Viva answer: "Our system is predictive — the ML model acts before water reaches critical level."',
+      'Demo blockage: cover drain outlet with finger — confirm blockage detection triggers in 5s',
+      'Demo preventive: slowly add water + rain — confirm gate pre-opens before reaching HIGH threshold',
     ],
   },
 ];
