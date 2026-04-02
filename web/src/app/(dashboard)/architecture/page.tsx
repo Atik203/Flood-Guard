@@ -40,9 +40,9 @@ function ArchFlowTab() {
 
       {/* Arrow 1 */}
       <div className="flex flex-col items-center py-6 gap-2">
-        <div className="w-0.5 h-8 bg-gradient-to-b from-fg-cyan to-transparent" />
+        <div className="w-0.5 h-8 bg-linear-to-b from-fg-cyan to-transparent" />
         <span className="text-sm font-mono px-5 py-2 rounded-full bg-fg-cyan/8 text-fg-cyan border border-fg-cyan/20 tracking-widest animate-[blink_1.5s_ease-in-out_infinite]">DIRECT WIRE · GPIO/ADC</span>
-        <div className="w-0.5 h-8 bg-gradient-to-b from-transparent to-fg-cyan/30" />
+        <div className="w-0.5 h-8 bg-linear-to-b from-transparent to-fg-cyan/30" />
       </div>
 
       {/* ESP32 */}
@@ -77,15 +77,15 @@ function ArchFlowTab() {
 
       {/* Arrow 2 */}
       <div className="flex flex-col items-center py-6 gap-2">
-        <div className="w-0.5 h-8 bg-gradient-to-b from-fg-amber to-transparent" />
+        <div className="w-0.5 h-8 bg-linear-to-b from-fg-amber to-transparent" />
         <span className="text-sm font-mono px-5 py-2 rounded-full bg-fg-amber/8 text-fg-amber border border-fg-amber/20 tracking-widest animate-[blink_1.5s_ease-in-out_infinite]">Wi-Fi · MQTT PROTOCOL · BIDIRECTIONAL</span>
-        <div className="w-0.5 h-8 bg-gradient-to-b from-transparent to-fg-amber/30" />
+        <div className="w-0.5 h-8 bg-linear-to-b from-transparent to-fg-amber/30" />
       </div>
 
       {/* Raspberry Pi 5 */}
       <motion.div initial={{ opacity:0, y:14 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.4 }} className="w-full">
         <p className="text-base font-mono tracking-[4px] text-muted-foreground uppercase mb-6">③ Raspberry Pi 5 — Brain</p>
-        <div className="relative rounded-3xl border-2 border-fg-amber/45 bg-gradient-to-br from-fg-amber/5 to-card p-8 shadow-[0_0_24px_rgba(255,170,0,0.08)]">
+        <div className="relative rounded-3xl border-2 border-fg-amber/45 bg-linear-to-br from-fg-amber/5 to-card p-8 shadow-[0_0_24px_rgba(255,170,0,0.08)]">
           <p className="absolute -top-[14px] left-6 text-sm font-mono tracking-[3px] text-fg-amber bg-background px-3 font-bold">CENTRAL BRAIN — ML + DASHBOARD</p>
           <div className="flex items-start gap-6">
             <div className="text-7xl shrink-0">🍓</div>
@@ -112,9 +112,9 @@ function ArchFlowTab() {
 
       {/* Arrow 3 */}
       <div className="flex flex-col items-center py-6 gap-2">
-        <div className="w-0.5 h-8 bg-gradient-to-b from-fg-green to-transparent" />
+        <div className="w-0.5 h-8 bg-linear-to-b from-fg-green to-transparent" />
         <span className="text-sm font-mono px-5 py-2 rounded-full bg-fg-green/8 text-fg-green border border-fg-green/20 tracking-widest animate-[blink_1.5s_ease-in-out_infinite]">HTTP · TELEGRAM · SQLITE</span>
-        <div className="w-0.5 h-8 bg-gradient-to-b from-transparent to-fg-green/30" />
+        <div className="w-0.5 h-8 bg-linear-to-b from-transparent to-fg-green/30" />
       </div>
 
       {/* Output layer */}

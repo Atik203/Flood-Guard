@@ -60,9 +60,9 @@ function HeroBg() {
 function SectionLabel({ children }: { children: string }) {
   return (
     <div className="flex items-center justify-center gap-4 mb-6">
-      <div className="h-px w-16 bg-gradient-to-r from-transparent to-fg-cyan/50" />
+      <div className="h-px w-16 bg-linear-to-r from-transparent to-fg-cyan/50" />
       <span className="text-base font-mono tracking-[6px] text-fg-cyan/90 uppercase font-bold">{children}</span>
-      <div className="h-px w-16 bg-gradient-to-l from-transparent to-fg-cyan/50" />
+      <div className="h-px w-16 bg-linear-to-l from-transparent to-fg-cyan/50" />
     </div>
   );
 }
@@ -404,9 +404,9 @@ export default function HomePage() {
                 </motion.div>
                 {layer.arrow && (
                   <div className="flex flex-col items-center py-3 gap-2">
-                    <div className="w-0.5 h-6 bg-gradient-to-b from-border to-transparent" />
+                    <div className="w-0.5 h-6 bg-linear-to-b from-border to-transparent" />
                     <span className="text-sm font-mono px-5 py-1.5 rounded-full border-2 border-border/50 text-muted-foreground bg-background font-bold animate-blink tracking-widest">{layer.arrow}</span>
-                    <div className="w-0.5 h-6 bg-gradient-to-t from-border to-transparent" />
+                    <div className="w-0.5 h-6 bg-linear-to-t from-border to-transparent" />
                   </div>
                 )}
               </div>
@@ -478,7 +478,7 @@ export default function HomePage() {
         <div className="absolute inset-0 pointer-events-none"
           style={{ background: 'radial-gradient(ellipse at center, rgba(0,200,255,0.06) 0%, transparent 70%)' }} />
         <motion.div initial={{ opacity:0, y:24 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} className="max-w-2xl mx-auto relative z-10">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-fg-cyan to-fg-cyan/40 flex items-center justify-center mx-auto mb-6 shadow-[0_0_32px_rgba(0,200,255,0.35)]">
+          <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-fg-cyan to-fg-cyan/40 flex items-center justify-center mx-auto mb-6 shadow-[0_0_32px_rgba(0,200,255,0.35)]">
             <Waves size={30} className="text-dark-base" />
           </div>
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground mb-4">
@@ -505,7 +505,7 @@ export default function HomePage() {
       <footer className="border-t border-border/20 py-10 px-4 sm:px-8 bg-card/10">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6 text-base text-muted-foreground">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-fg-cyan to-fg-cyan/40 flex items-center justify-center shadow-sm">
+            <div className="w-8 h-8 rounded-xl bg-linear-to-br from-fg-cyan to-fg-cyan/40 flex items-center justify-center shadow-sm">
               <Waves size={16} className="text-dark-base" />
             </div>
             <span className="font-bold text-foreground tracking-wide">FloodGuard</span>

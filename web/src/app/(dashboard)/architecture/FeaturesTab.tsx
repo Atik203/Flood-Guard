@@ -280,7 +280,7 @@ function ProportionalFeature() {
           </div>
 
           {/* Visual animation */}
-          <div className="p-8 flex items-center justify-center relative min-h-[300px] bg-gradient-to-br from-background to-muted/20">
+          <div className="p-8 flex items-center justify-center relative min-h-[300px] bg-linear-to-br from-background to-muted/20">
             <div className="relative w-64 h-64 border-4 border-border/60 rounded-full flex items-center justify-center overflow-hidden shadow-xl bg-card">
               {/* Gate visual */}
               <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
