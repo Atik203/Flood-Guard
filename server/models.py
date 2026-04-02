@@ -40,3 +40,14 @@ class SystemStatusDB(Base):
     mqtt_broker = Column(Boolean, default=True)
     uptime_hours = Column(Float, default=0.0)
     gate_open = Column(Boolean, default=False)
+
+class SettingsDB(Base):
+    __tablename__ = "settings"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    telegram_alerts = Column(Boolean, default=True)
+    high_alert = Column(Boolean, default=True)
+    medium_alert = Column(Boolean, default=False)
+    threshold_medium = Column(Integer, default=20)
+    threshold_high = Column(Integer, default=50)
+    threshold_crit = Column(Integer, default=80)

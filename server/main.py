@@ -109,3 +109,36 @@ def get_ml_analytics():
             {"feature": "flow_lpm", "importance": 0.09}
         ]
     }
+
+class SettingsUpdate(BaseModel):
+    telegram_alerts: Optional[bool] = None
+    high_alert: Optional[bool] = None
+    medium_alert: Optional[bool] = None
+    threshold_medium: Optional[int] = None
+    threshold_high: Optional[int] = None
+    threshold_crit: Optional[int] = None
+
+@app.get("/api/system/settings")
+def get_settings(db: Session = Depends(get_db)):
+    settings = db.query(models.SettingsDB).first()
+    if not settings:
+        settings = models.SettingsDB()
+        db.add(settings)
+        db.commit()
+        db.refresh(settings)
+    return settings
+
+@app.put("/api/system/settings")
+def update_settings(update: SettingsUpdate, db: Session = Depends(get_db)):
+    settings = db.query(models.SettingsDB).first()
+    if not settings:
+        settings = models.SettingsDB()
+        db.add(settings)
+    
+    update_data = update.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(settings, key, value)
+        
+    db.commit()
+    db.refresh(settings)
+    return settings

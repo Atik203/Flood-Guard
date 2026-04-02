@@ -21,7 +21,23 @@ export function useFloodBackend() {
   // Fetch ML analytics
   const { data: mlStats, error: mlErr } = useSWR<MLStats>(`${API_URL}/ml/analytics`, fetcher, { refreshInterval: 60000 });
 
-  const isLoading = !currentReading || !timelineData || !alertsData || !sysStatus || !mlStats;
+  // Fetch settings
+  const { data: appSettings, mutate: refreshSettings } = useSWR(`${API_URL}/system/settings`, fetcher, { refreshInterval: 10000 });
+
+  const updateSettings = async (updates: any) => {
+    try {
+      await fetch(`${API_URL}/system/settings`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      });
+      refreshSettings(undefined, { revalidate: true });
+    } catch(e) {
+      console.error(e);
+    }
+  };
+
+  const isLoading = !currentReading || !timelineData || !alertsData || !sysStatus || !mlStats || !appSettings;
   const isError = currentErr || timelineErr || alertsErr || sysErr || mlErr;
 
   // Process timeline data (backend returns oldest to newest or newest to oldest? Usually newest first from desc, let's reverse if needed)
@@ -56,6 +72,8 @@ export function useFloodBackend() {
     alertsData: alertsData || [],
     sysStatus,
     mlStats: safeMlStats,
+    appSettings,
+    updateSettings,
     risk,
     gateOperations,
     isLoading,

@@ -3,26 +3,57 @@ import { motion } from 'framer-motion';
 import { Settings, Moon, Sun, Bell, Sliders } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useTheme } from '@/context/ThemeProvider';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useFloodBackend } from '@/hooks/useBackend';
 
 export default function SettingsPage() {
   const { theme, toggleTheme } = useTheme();
+  const { appSettings, updateSettings, isLoading } = useFloodBackend();
 
   const [toggles, setToggles] = useState({
     telegram: true,
     high: true,
     medium: false
   });
+  
+  const [thresholdsState, setThresholdsState] = useState({
+    medium: 20, high: 50, crit: 80
+  });
+
+  useEffect(() => {
+    if (appSettings) {
+      setToggles({
+        telegram: appSettings.telegram_alerts,
+        high: appSettings.high_alert,
+        medium: appSettings.medium_alert,
+      });
+      setThresholdsState({
+        medium: appSettings.threshold_medium,
+        high: appSettings.threshold_high,
+        crit: appSettings.threshold_crit,
+      });
+    }
+  }, [appSettings]);
 
   const handleToggle = (key: keyof typeof toggles) => {
-    setToggles(prev => ({ ...prev, [key]: !prev[key] }));
+    const newVal = !toggles[key];
+    setToggles(prev => ({ ...prev, [key]: newVal }));
+    
+    // sync to backend
+    if (key === 'telegram') updateSettings({ telegram_alerts: newVal });
+    if (key === 'high') updateSettings({ high_alert: newVal });
+    if (key === 'medium') updateSettings({ medium_alert: newVal });
   };
 
   const thresholds = [
-    { label: 'MEDIUM Threshold', key: 'medium', value: 20, unit: 'cm', color: '#FFAA00' },
-    { label: 'HIGH Threshold',   key: 'high',   value: 50, unit: 'cm', color: '#FF7A00' },
-    { label: 'CRITICAL Threshold', key: 'crit', value: 80, unit: 'cm', color: '#FF4444' },
+    { label: 'MEDIUM Threshold', key: 'medium', value: thresholdsState.medium, unit: 'cm', color: '#FFAA00' },
+    { label: 'HIGH Threshold',   key: 'high',   value: thresholdsState.high, unit: 'cm', color: '#FF7A00' },
+    { label: 'CRITICAL Threshold', key: 'crit', value: thresholdsState.crit, unit: 'cm', color: '#FF4444' },
   ];
+
+  if (isLoading) {
+    return <div className="p-10 text-center font-mono text-muted-foreground animate-pulse">Loading live settings...</div>;
+  }
 
   return (
     <div className="p-6 space-y-6 min-h-screen">
@@ -90,9 +121,16 @@ export default function SettingsPage() {
                       <label className="text-xs font-mono font-bold" style={{ color: t.color }}>{t.label}</label>
                       <span className="text-xs font-mono text-muted-foreground">{t.value} {t.unit}</span>
                     </div>
-                    <input type="range" min={0} max={100} defaultValue={t.value}
+                    <input type="range" min={0} max={100} value={t.value}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value);
+                        setThresholdsState(prev => ({ ...prev, [t.key]: val }));
+                        // Update on slide (Backend will debounce this if needed, or update instantly)
+                        const mapping: Record<string, string> = { medium: 'threshold_medium', high: 'threshold_high', crit: 'threshold_crit' };
+                        updateSettings({ [mapping[t.key]]: val });
+                      }}
                       className="w-full h-2 rounded-full appearance-none cursor-pointer"
-                      style={{ accentColor: t.color }} />
+                      style={{ accentColor: t.color, background: 'var(--border)' }} />
                     <div className="flex justify-between text-[10px] font-mono text-muted-foreground"><span>0 cm</span><span>100 cm</span></div>
                   </div>
                 ))}

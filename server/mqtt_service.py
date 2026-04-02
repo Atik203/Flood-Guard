@@ -5,7 +5,7 @@ import logging
 import paho.mqtt.client as mqtt
 from datetime import datetime, timezone
 from database import SessionLocal
-from models import SensorReadingDB, AlertDB
+from models import SensorReadingDB, AlertDB, SettingsDB
 from ml_service import MLService
 
 logger = logging.getLogger(__name__)
@@ -68,33 +68,41 @@ class MQTTService:
         # ML Prediction
         risk_level = self.ml_service.predict_risk(water_cm, rain_intensity, flow_lpm, rate_of_change)
 
-        # Active Logic
-        gate_open = False
-        target_angle = 0
-        gate_action_str = None
-        
-        if risk_level in ['HIGH', 'CRITICAL']:
-            gate_open = True
-            
-            # Blockage logic
-            if water_cm > 50 and flow_lpm < 1.0:
-                # Need flush
-                gate_action_str = "Auto-flush sequence initiated (Blockage Detected)"
-                self.set_gate(180) # Mock sweep
-                target_angle = 180
-            else:
-                gate_action_str = "Gate OPENED automatically"
-                self.set_gate(90)
-                target_angle = 90
-        elif risk_level == 'MEDIUM':
-            gate_open = True
-            self.set_gate(45)
-            target_angle = 45
-        else:
-            self.set_gate(0)
-
         db = SessionLocal()
         try:
+            settings = db.query(SettingsDB).first()
+            if not settings:
+                settings = SettingsDB()
+
+            # Active Logic Override if using mock model fallback
+            # Since ML handles risk generally, we can bind gate actions to thresholds dynamically
+            if water_cm >= settings.threshold_crit:
+                risk_level = 'CRITICAL'
+            elif water_cm >= settings.threshold_high and risk_level == 'LOW':
+                risk_level = 'HIGH'
+
+            gate_open = False
+            target_angle = 0
+            gate_action_str = None
+            
+            if risk_level in ['HIGH', 'CRITICAL'] or water_cm >= settings.threshold_high:
+                gate_open = True
+                
+                if water_cm > 50 and flow_lpm < 1.0:
+                    gate_action_str = "Auto-flush sequence initiated (Blockage Detected)"
+                    self.set_gate(180) 
+                    target_angle = 180
+                else:
+                    gate_action_str = "Gate OPENED automatically"
+                    self.set_gate(90)
+                    target_angle = 90
+            elif risk_level == 'MEDIUM' or water_cm >= settings.threshold_medium:
+                gate_open = True
+                self.set_gate(45)
+                target_angle = 45
+            else:
+                self.set_gate(0)
+
             # Save reading
             reading = SensorReadingDB(
                 water_cm=water_cm,
@@ -111,17 +119,25 @@ class MQTTService:
             
             # Generate alert if HIGH/CRITICAL or block detected
             if risk_level in ['HIGH', 'CRITICAL'] and gate_action_str:
+                should_send_tg = False
+                if settings.telegram_alerts:
+                    if risk_level == 'CRITICAL':
+                        should_send_tg = True
+                    elif risk_level == 'HIGH' and settings.high_alert:
+                        should_send_tg = True
+
                 alert = AlertDB(
                     risk_level=risk_level,
                     water_cm=water_cm,
                     rain_intensity=rain_intensity,
                     flow_lpm=flow_lpm,
                     action=gate_action_str,
-                    telegram_sent=True,
+                    telegram_sent=should_send_tg,
                     message=f"🚨 FLOOD {risk_level}: Water at {water_cm}cm. Action: {gate_action_str}"
                 )
                 db.add(alert)
-                self.send_telegram(alert.message)
+                if should_send_tg:
+                    self.send_telegram(alert.message)
 
             db.commit()
         except Exception as e:
