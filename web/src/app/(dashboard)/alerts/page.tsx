@@ -3,8 +3,9 @@ import { motion } from 'framer-motion';
 import { Bell, Download, MessageCircle, CheckCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { alerts, sensorTimeline, riskColors } from '@/data/mockSensorData';
+import { riskColors } from '@/data/mockSensorData';
 import { cn } from '@/lib/utils';
+import { useFloodBackend } from '@/hooks/useBackend';
 
 function fmtTime(iso: string) {
   return new Date(iso).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
@@ -15,7 +16,13 @@ function riskBadge(level: string) {
 }
 
 export default function AlertsPage() {
-  const recentReadings = sensorTimeline.slice(-20);
+  const { sensorTimeline, alertsData, isLoading } = useFloodBackend();
+
+  if (isLoading) {
+    return <div className="p-10 text-center font-mono text-muted-foreground animate-pulse">Loading live alerts...</div>;
+  }
+
+  const recentReadings = [...sensorTimeline].slice(-20);
 
   return (
     <div className="p-6 space-y-6 min-h-screen">
@@ -29,10 +36,10 @@ export default function AlertsPage() {
       {/* Stats row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Total Alerts', value: alerts.length.toString(),                                      color: '#FF4444' },
-          { label: 'CRITICAL',     value: alerts.filter(a => a.risk_level === 'CRITICAL').length.toString(), color: '#FF4444' },
-          { label: 'Telegram Sent', value: alerts.filter(a => a.telegram_sent).length.toString(),        color: '#C084FC' },
-          { label: 'Resolved',     value: alerts.filter(a => a.risk_level === 'LOW').length.toString(),  color: '#00E676' },
+          { label: 'Total Alerts', value: alertsData.length.toString(),                                      color: '#FF4444' },
+          { label: 'CRITICAL',     value: alertsData.filter(a => a.risk_level === 'CRITICAL').length.toString(), color: '#FF4444' },
+          { label: 'Telegram Sent', value: alertsData.filter(a => a.telegram_sent).length.toString(),        color: '#C084FC' },
+          { label: 'Resolved/Logs', value: alertsData.filter(a => a.risk_level === 'LOW').length.toString(),  color: '#00E676' },
         ].map((s, i) => (
           <motion.div key={s.label} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}
             className="rounded-2xl bg-card border border-border/50 p-5">
@@ -52,7 +59,7 @@ export default function AlertsPage() {
               <CardTitle className="text-xl">Alert Feed</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 max-h-96 overflow-y-auto pr-2">
-              {alerts.map((a, i) => (
+              {alertsData.slice(0, 50).map((a, i) => (
                 <motion.div
                   key={a.id}
                   initial={{ opacity: 0, x: -12 }}
@@ -88,7 +95,7 @@ export default function AlertsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 max-h-96 overflow-y-auto pr-2">
-              {alerts.filter(a => a.telegram_sent).map((a, i) => (
+              {alertsData.filter(a => a.telegram_sent).map((a, i) => (
                 <motion.div
                   key={a.id}
                   initial={{ opacity: 0, y: 8 }}
@@ -132,7 +139,7 @@ export default function AlertsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {recentReadings.reverse().map((r, i) => (
+                {recentReadings.map((r, i) => (
                   <TableRow key={r.id} className="border-border/30 hover:bg-muted/30 transition-colors">
                     <TableCell className="font-mono text-sm text-muted-foreground whitespace-nowrap px-4 py-3">{fmtTime(r.timestamp)}</TableCell>
                     <TableCell className="font-mono text-base font-bold text-fg-cyan px-4 py-3">{r.water_cm}</TableCell>

@@ -6,7 +6,8 @@ import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, Legend,
 } from 'recharts';
-import { sensorTimeline, mlStats, riskColors } from '@/data/mockSensorData';
+import { riskColors } from '@/data/mockSensorData';
+import { useFloodBackend } from '@/hooks/useBackend';
 
 function fmt(iso: string) {
   return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -25,7 +26,13 @@ function CustomTooltip({ active, payload, label }: any) {
 }
 
 export default function AnalyticsPage() {
-  const chart = sensorTimeline.slice(-72).map(r => ({
+  const { sensorTimeline, mlStats, isLoading } = useFloodBackend();
+
+  if (isLoading) {
+    return <div className="p-10 text-center font-mono text-muted-foreground animate-pulse">Computing ML analytics...</div>;
+  }
+
+  const chart = [...sensorTimeline].reverse().slice(-72).map(r => ({
     time:      fmt(r.timestamp),
     water:     r.water_cm,
     rain:      r.rain_intensity,
@@ -56,10 +63,10 @@ export default function AnalyticsPage() {
       {/* Model KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         {[
-          { label: 'Accuracy',          value: `${mlStats.accuracy}%`,               color: '#00E676' },
-          { label: 'Training Samples',  value: mlStats.training_samples.toLocaleString(), color: '#00C8FF' },
-          { label: 'Predictions Today', value: mlStats.predictions_today.toLocaleString(), color: '#C084FC' },
-          { label: 'Features Used',     value: mlStats.features.length.toString(),    color: '#FFAA00' },
+          { label: 'Accuracy',          value: `${mlStats?.accuracy || 0}%`,               color: '#00E676' },
+          { label: 'Training Samples',  value: mlStats?.training_samples?.toLocaleString() || '0', color: '#00C8FF' },
+          { label: 'Predictions Today', value: mlStats?.predictions_today?.toLocaleString() || '0', color: '#C084FC' },
+          { label: 'Features Used',     value: mlStats?.features?.length?.toString() || '0',    color: '#FFAA00' },
         ].map((s, i) => (
           <motion.div key={s.label} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}
             className="rounded-2xl bg-card border border-border/50 p-5">
@@ -126,10 +133,10 @@ export default function AnalyticsPage() {
           <Card className="border-border/50 bg-card h-full">
             <CardHeader className="pb-4">
               <p className="text-sm font-mono tracking-widest text-muted-foreground uppercase font-bold mb-1">MODEL INTERNALS</p>
-              <CardTitle className="text-xl">Feature Importance</CardTitle>
+              <span className="text-xl">Feature Importance</span>
             </CardHeader>
             <CardContent className="space-y-4 pt-2">
-              {mlStats.feature_importance.map((f, i) => (
+              {mlStats?.feature_importance?.map((f, i) => (
                 <div key={f.feature}>
                   <div className="flex justify-between text-base mb-2">
                     <span className="font-mono text-muted-foreground font-medium">{f.feature}</span>
@@ -148,7 +155,7 @@ export default function AnalyticsPage() {
               ))}
               <div className="pt-4 mt-2 border-t border-border/40 space-y-1">
                 <p className="text-sm font-mono text-muted-foreground">Model: <span className="text-foreground">{mlStats.model_type}</span></p>
-                <p className="text-sm font-mono text-muted-foreground">Last trained: <span className="text-foreground">{new Date(mlStats.last_trained).toLocaleDateString()}</span></p>
+                <p className="text-sm font-mono text-muted-foreground">Last trained: <span className="text-foreground">{mlStats.last_trained ? new Date(mlStats.last_trained).toLocaleDateString() : 'N/A'}</span></p>
               </div>
             </CardContent>
           </Card>
