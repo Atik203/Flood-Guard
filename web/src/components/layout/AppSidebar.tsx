@@ -22,8 +22,9 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useFloodBackend } from "@/hooks/useBackend";
 
-const NAV = [
+const NAV_ITEMS = [
   { href: "/", icon: Home, label: "Home", badge: null },
   {
     href: "/dashboard",
@@ -32,7 +33,7 @@ const NAV = [
     badge: null,
   },
   { href: "/analytics", icon: TrendingUp, label: "Analytics", badge: null },
-  { href: "/alerts", icon: Bell, label: "Alerts", badge: "8" },
+  { href: "/alerts", icon: Bell, label: "Alerts" },
   { href: "/architecture", icon: Cpu, label: "Architecture", badge: null },
   { href: "/settings", icon: Settings, label: "Settings", badge: null },
 ];
@@ -40,6 +41,7 @@ const NAV = [
 export function AppSidebar() {
   const path = usePathname();
   const { theme, toggleTheme } = useTheme();
+  const { alertsData } = useFloodBackend();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -114,8 +116,10 @@ export function AppSidebar() {
             Navigation
           </p>
         )}
-        {NAV.map(({ href, icon: Icon, label, badge }) => {
+        {NAV_ITEMS.map(({ href, icon: Icon, label }) => {
           const active = path === href;
+          const badge = href === "/alerts" && alertsData?.length ? alertsData.length.toString() : null;
+          
           return (
             <Link
               key={href}

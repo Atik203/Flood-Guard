@@ -125,7 +125,9 @@ export default function SettingsPage() {
                       onChange={(e) => {
                         const val = parseInt(e.target.value);
                         setThresholdsState(prev => ({ ...prev, [t.key]: val }));
-                        // Update on slide (Backend will debounce this if needed, or update instantly)
+                      }}
+                      onPointerUp={(e) => {
+                        const val = parseInt((e.target as HTMLInputElement).value);
                         const mapping: Record<string, string> = { medium: 'threshold_medium', high: 'threshold_high', crit: 'threshold_crit' };
                         updateSettings({ [mapping[t.key]]: val });
                       }}
