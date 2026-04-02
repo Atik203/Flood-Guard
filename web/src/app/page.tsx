@@ -7,6 +7,7 @@ import {
   ArrowRight, ChevronDown, Wifi, Database, Zap,
   BarChart3, MessageCircle, Droplets, CloudRain, Wind, Thermometer,
   CheckCircle, Globe, BookOpen, Sun, Moon,
+  ShieldAlert, TrendingUp
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -69,46 +70,46 @@ function SectionLabel({ children }: { children: string }) {
 /* ─── Feature card ────────────────────────────────────── */
 const FEATURES = [
   {
-    icon: Activity,
-    color: '#00C8FF',
-    title: 'Real-Time Monitoring',
-    desc: 'All 4 sensors (water level, rain, flow rate, temperature) stream live data every second via MQTT protocol from ESP32 to Raspberry Pi 5.',
-    tags: ['HC-SR04', 'YL-83', 'YF-S201', 'DHT22'],
-  },
-  {
     icon: Brain,
     color: '#C084FC',
     title: 'ML Flood Prediction',
-    desc: 'A Decision Tree classifier (scikit-learn) trained on 2,000+ samples predicts flood risk into 4 levels — LOW, MEDIUM, HIGH, CRITICAL — in under 2ms.',
-    tags: ['Decision Tree', '96.5% Accuracy', '4 Classes'],
+    desc: 'A Decision Tree classifier predicts flood risk into 4 levels. Each level directly computes specific gate angles mapping to 0°, 40°, or 100°.',
+    tags: ['Decision Tree', '96.5% Accuracy', 'Gate Mapping'],
   },
   {
-    icon: Shield,
+    icon: Waves,
+    color: '#00C8FF',
+    title: 'Proportional Drain Control',
+    desc: 'Water level automatically controls proportional gate angle continuously. Gate opens gradually instead of binary ON/OFF.',
+    tags: ['Servo Motor', 'Dynamic Calculation', '180° Range'],
+  },
+  {
+    icon: ShieldAlert,
+    color: '#FF4444',
+    title: 'Blockage Detection',
+    desc: 'Tracks flow vs. gate state. If gate is open but flow is zero for 5s, system triggers a mechanical pulse flush to clear debris.',
+    tags: ['3x Mechanical Flush', 'Flow Integrity', 'Auto Recovery'],
+  },
+  {
+    icon: TrendingUp,
+    color: '#FFAA00',
+    title: 'Trend-Based Preventive',
+    desc: 'Pi tracks the last 10 readings. If rain and water simultaneously rise, it pre-opens the gate 50% before any risk threshold is crossed.',
+    tags: ['Predictive Logic', 'Trend A.I.', 'Pre-Emptive'],
+  },
+  {
+    icon: Activity,
     color: '#00E676',
-    title: 'Auto Gate Control',
-    desc: 'When flood risk reaches HIGH or CRITICAL, the Pi publishes an OPEN command via MQTT. The ESP32 drives the L298N motor driver to open the drain gate.',
-    tags: ['Servo Motor', 'L298N Driver', 'Auto + Manual'],
+    title: 'Real-Time Telemetry',
+    desc: 'Instant streaming of all sensor metrics over high-speed MQTT. Dashboard and UI dynamically update every 500ms.',
+    tags: ['Mosquitto MQTT', 'Raspberry Pi 5', 'ESP32'],
   },
   {
     icon: Bell,
-    color: '#FF4444',
-    title: 'Telegram Alerts',
-    desc: 'Instant push notifications sent to your phone via Telegram Bot API when critical conditions are detected. Includes water level, risk label, and gate status.',
-    tags: ['Telegram Bot', 'Push Notify', 'HTTPS API'],
-  },
-  {
-    icon: BarChart3,
-    color: '#FFAA00',
-    title: 'Web Dashboard',
-    desc: 'A Next.js 16 dashboard accessible from any device on the local network. Features live charts, 24-hour history, ML stats, and full alert log.',
-    tags: ['Next.js 16', 'Recharts', 'Responsive'],
-  },
-  {
-    icon: Database,
     color: '#C084FC',
-    title: 'Data Logging & CSV Export',
-    desc: 'Every sensor reading and ML prediction is persisted to SQLite on the Pi. Export full CSV for research, reporting, or model retraining.',
-    tags: ['SQLite', 'CSV Export', '10-min intervals'],
+    title: 'Automated Alerting',
+    desc: 'Instant push notifications sent via Telegram on CRITICAL flood risk or CONFIRMED blockage events.',
+    tags: ['Telegram Bot', 'Push Notify', 'Buzzer Alarm'],
   },
 ];
 
@@ -128,12 +129,12 @@ const STACK = [
 
 /* ─── System flow steps ───────────────────────────────── */
 const FLOW = [
-  { step: '01', icon: Droplets,     color: '#00C8FF', title: 'Sensors Sample',   desc: 'HC-SR04 fires ultrasonic pulse, YL-83 reads rain analog, YF-S201 counts flow pulses, DHT22 reads temp — all wired to ESP32 GPIO pins.' },
-  { step: '02', icon: Wifi,         color: '#FFAA00', title: 'MQTT Publish',      desc: 'ESP32 formats JSON payload and publishes to topic flood/sensors on Mosquitto broker running on Raspberry Pi 5 every second.' },
-  { step: '03', icon: Brain,        color: '#C084FC', title: 'ML Prediction',     desc: 'Pi\'s Python subscriber receives data, feeds 4 features into Decision Tree model, gets risk class (0-3) in microseconds.' },
-  { step: '04', icon: Shield,       color: '#00E676', title: 'Auto Response',     desc: 'If risk ≥ HIGH, Pi publishes OPEN to flood/command. ESP32 receives command, drives servo via L298N to open drain gate.' },
-  { step: '05', icon: MessageCircle,color: '#FF4444', title: 'Alert & Log',       desc: 'CRITICAL triggers Telegram Bot alert to operator\'s phone. All readings + predictions are saved to SQLite with timestamp.' },
-  { step: '06', icon: BarChart3,    color: '#C084FC', title: 'Dashboard Update',  desc: 'Next.js dashboard polls Flask API every 5s. Charts update live — you see water level trend, risk gauge, and full alert history.' },
+  { step: '01', icon: Droplets,     color: '#00C8FF', title: 'Sensors Sample',    desc: 'Sensors report water level, rain, and flow rate to ESP32 every 500ms.' },
+  { step: '02', icon: Wifi,         color: '#FFAA00', title: 'MQTT Publish',      desc: 'ESP32 formats JSON payload and publishes to Mosquitto broker on Pi.' },
+  { step: '03', icon: TrendingUp,   color: '#00E676', title: 'Trend Check',       desc: 'Pi analyzes slope of last 10 readings. Pre-opens gate if rain & water are rising.' },
+  { step: '04', icon: Brain,        color: '#C084FC', title: 'ML Prediction',     desc: 'Pi Decision Tree classifies data risk (LOW/MED/HIGH/CRIT) and computes gate angle.' },
+  { step: '05', icon: ShieldAlert,  color: '#FF4444', title: 'Safety Logic',      desc: 'ESP32 drives gate proportionally. If flow is zero while open, mechanical flush initiates.' },
+  { step: '06', icon: MessageCircle,color: '#00C8FF', title: 'Alert & Log',       desc: 'CRITICAL triggers Telegram Bot alert. All readings are saved to SQLite.' },
 ];
 
 /* ─── Hardware specs ──────────────────────────────────── */
@@ -207,7 +208,7 @@ export default function HomePage() {
             An IoT-based flood detection and prevention system using{' '}
             <span className="text-fg-cyan font-semibold">ESP32</span>,{' '}
             <span className="text-fg-amber font-semibold">Raspberry Pi 5</span>,{' '}
-            <span className="text-fg-purple font-semibold">Machine Learning</span>, and automated gate control —
+            <span className="text-fg-purple font-semibold">Proportional Flow</span>, and trend analysis —
             built for the <strong className="text-foreground">Microprocessor Lab</strong> course.
           </motion.p>
 
@@ -268,9 +269,9 @@ export default function HomePage() {
         <motion.div initial={{ opacity:0, y:24 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} className="text-center mb-16">
           <SectionLabel>Core Features</SectionLabel>
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
-            4 Major Features + More
+            6 Major System Features
           </h2>
-          <p className="text-muted-foreground mt-4 max-w-xl mx-auto">Everything working together as a complete embedded system — from sensor to dashboard.</p>
+          <p className="text-muted-foreground mt-4 max-w-xl mx-auto">Everything works together, featuring predictive AI, adaptive controls, and active safety checks.</p>
         </motion.div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -437,7 +438,7 @@ export default function HomePage() {
               Unlike simple threshold-based alarms, our system <strong className="text-foreground">predicts</strong> floods before they peak — giving critical lead time for automated and manual intervention.
             </p>
             <div className="space-y-2">
-              {['Sensor-to-Cloud pipeline in under 1 second', 'ML prediction with 96.5% accuracy on 2000 samples', 'Auto gate control with manual override via dashboard', 'Full data log — exportable to CSV for research'].map(item => (
+              {['Proportional control calculates 0°-180° automatically', 'Preventive AI pre-opens gate before thresholds cross', 'Blockage detection verifies gate output vs. actual flow', 'ML prediction with 96.5% accuracy runs locally on Pi'].map(item => (
                 <div key={item} className="flex items-start gap-2.5">
                   <CheckCircle size={16} className="text-fg-green mt-0.5 shrink-0" />
                   <span className="text-sm text-muted-foreground">{item}</span>

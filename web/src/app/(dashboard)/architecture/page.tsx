@@ -7,6 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { sensors, outputs, esp32Chips, esp32LocalOutputs, piChips, pinMappings, softwarePorts, buildSteps } from '@/data/mockArchitectureData';
 import { cn } from '@/lib/utils';
+import { FeaturesTab } from './FeaturesTab';
+
 
 // ─── Architecture Flow ────────────────────────────────────────────────────────
 function ArchFlowTab() {
@@ -398,9 +400,10 @@ export default function ArchitecturePage() {
         <p className="text-lg text-muted-foreground mt-3 leading-relaxed">Complete system design — components, wiring, build steps, and pin mapping</p>
       </motion.div>
 
-      <Tabs defaultValue="flow">
+      <Tabs defaultValue="features">
         <TabsList className="bg-muted/50 border border-border/50 h-auto p-1.5 flex-wrap gap-2 rounded-xl">
           {[
+            { value:'features', label:'Features (Prototype)' },
             { value:'flow',     label:'Architecture Flow' },
             { value:'physical', label:'Component Map'      },
             { value:'steps',    label:'Build Steps'        },
@@ -413,6 +416,7 @@ export default function ArchitecturePage() {
           ))}
         </TabsList>
         <div className="mt-8">
+          <TabsContent value="features" className="m-0"><FeaturesTab /></TabsContent>
           <TabsContent value="flow"     className="m-0"><ArchFlowTab /></TabsContent>
           <TabsContent value="physical" className="m-0"><PhysicalTab /></TabsContent>
           <TabsContent value="steps"    className="m-0"><BuildStepsTab /></TabsContent>
