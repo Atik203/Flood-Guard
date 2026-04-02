@@ -1,24 +1,40 @@
-'use client';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+"use client";
+import { Badge } from "@/components/ui/badge";
+import { useTheme } from "@/context/ThemeProvider";
+import { cn } from "@/lib/utils";
+import { AnimatePresence, motion } from "framer-motion";
 import {
-  LayoutDashboard, TrendingUp, Bell, Cpu, Settings,
-  ChevronLeft, ChevronRight, Waves, Moon, Sun, Wifi, Home,
-  Menu, X
-} from 'lucide-react';
-import { useTheme } from '@/context/ThemeProvider';
-import { cn } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
+  Bell,
+  ChevronLeft,
+  ChevronRight,
+  Cpu,
+  Home,
+  LayoutDashboard,
+  Menu,
+  Moon,
+  Settings,
+  Sun,
+  TrendingUp,
+  Waves,
+  Wifi,
+  X,
+} from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const NAV = [
-  { href: '/',              icon: Home,           label: 'Home',         badge: null },
-  { href: '/dashboard',     icon: LayoutDashboard,label: 'Dashboard',    badge: null },
-  { href: '/analytics',     icon: TrendingUp,     label: 'Analytics',    badge: null },
-  { href: '/alerts',        icon: Bell,           label: 'Alerts',       badge: '8'  },
-  { href: '/architecture',  icon: Cpu,            label: 'Architecture', badge: null },
-  { href: '/settings',      icon: Settings,       label: 'Settings',     badge: null },
+  { href: "/", icon: Home, label: "Home", badge: null },
+  {
+    href: "/dashboard",
+    icon: LayoutDashboard,
+    label: "Dashboard",
+    badge: null,
+  },
+  { href: "/analytics", icon: TrendingUp, label: "Analytics", badge: null },
+  { href: "/alerts", icon: Bell, label: "Alerts", badge: "8" },
+  { href: "/architecture", icon: Cpu, label: "Architecture", badge: null },
+  { href: "/settings", icon: Settings, label: "Settings", badge: null },
 ];
 
 export function AppSidebar() {
@@ -35,37 +51,43 @@ export function AppSidebar() {
   // Lock body scroll when mobile menu is open
   useEffect(() => {
     if (mobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     }
   }, [mobileMenuOpen]);
 
-  const sidebarWidth = collapsed ? 'w-20' : 'w-72';
+  const sidebarWidth = collapsed ? "w-20" : "w-72";
 
   // Desktop Sidebar Content
   const SidebarContent = ({ isMobile = false }) => (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Logo */}
-      <div className="flex items-center gap-4 px-5 py-6 border-b border-border/40 shrink-0">
-        <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-fg-cyan to-fg-cyan/40 flex items-center justify-center shrink-0 shadow-[0_0_16px_rgba(0,200,255,0.35)]">
-          <Waves size={20} className="text-white dark:text-dark-base" />
+      <Link href="/">
+        <div className="flex items-center gap-4 px-5 py-6 border-b border-border/40 shrink-0">
+          <div className="w-10 h-10 rounded-2xl bg-linear-to-br from-fg-cyan to-fg-cyan/40 flex items-center justify-center shrink-0 shadow-[0_0_16px_rgba(0,200,255,0.35)]">
+            <Waves size={20} className="text-white dark:text-dark-base" />
+          </div>
+          <AnimatePresence>
+            {(!collapsed || isMobile) && (
+              <motion.div
+                initial={{ opacity: 0, x: -6 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -6 }}
+                transition={{ duration: 0.15 }}
+                className="overflow-hidden"
+              >
+                <p className="text-lg font-bold text-foreground leading-none tracking-wide">
+                  FloodGuard
+                </p>
+                <p className="text-xs font-mono text-muted-foreground tracking-[3px] mt-1">
+                  IoT MONITOR
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
-        <AnimatePresence>
-          {(!collapsed || isMobile) && (
-            <motion.div
-              initial={{ opacity: 0, x: -6 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -6 }}
-              transition={{ duration: 0.15 }}
-              className="overflow-hidden"
-            >
-              <p className="text-lg font-bold text-foreground leading-none tracking-wide">FloodGuard</p>
-              <p className="text-xs font-mono text-muted-foreground tracking-[3px] mt-1">IoT MONITOR</p>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+      </Link>
 
       {/* Status pill */}
       <AnimatePresence>
@@ -77,7 +99,9 @@ export function AppSidebar() {
             className="mx-4 mt-4 mb-2 flex items-center gap-3 px-4 py-2.5 rounded-xl bg-fg-green/10 border border-fg-green/20"
           >
             <span className="w-2.5 h-2.5 rounded-full bg-fg-green animate-pulse-dot shadow-[0_0_6px_#00E676] shrink-0" />
-            <span className="text-xs font-mono font-bold text-fg-green tracking-wider">SYSTEM ONLINE</span>
+            <span className="text-xs font-mono font-bold text-fg-green tracking-wider">
+              SYSTEM ONLINE
+            </span>
             <Wifi size={14} className="text-fg-green ml-auto shrink-0" />
           </motion.div>
         )}
@@ -98,16 +122,22 @@ export function AppSidebar() {
               href={href}
               title={collapsed && !isMobile ? label : undefined}
               className={cn(
-                'relative flex items-center gap-4 px-4 py-3.5 rounded-xl text-base font-semibold transition-all duration-200 group',
+                "relative flex items-center gap-4 px-4 py-3.5 rounded-xl text-base font-semibold transition-all duration-200 group",
                 active
-                  ? 'bg-fg-cyan/15 text-fg-cyan shadow-sm border border-fg-cyan/10'
-                  : 'text-muted-foreground hover:bg-accent hover:text-foreground',
+                  ? "bg-fg-cyan/15 text-fg-cyan shadow-sm border border-fg-cyan/10"
+                  : "text-muted-foreground hover:bg-accent hover:text-foreground",
               )}
             >
               {active && (
                 <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-fg-cyan rounded-r-full shadow-[0_0_8px_#00C8FF]" />
               )}
-              <Icon size={20} className={cn('flex-shrink-0 transition-transform duration-200', 'group-hover:scale-110')} />
+              <Icon
+                size={20}
+                className={cn(
+                  "flex-shrink-0 transition-transform duration-200",
+                  "group-hover:scale-110",
+                )}
+              />
               <AnimatePresence>
                 {(!collapsed || isMobile) && (
                   <motion.span
@@ -135,19 +165,28 @@ export function AppSidebar() {
         <button
           onClick={toggleTheme}
           className="w-full flex items-center justify-center gap-4 px-4 py-3 rounded-xl border border-border/50 text-base font-medium text-foreground bg-card hover:bg-accent hover:border-fg-cyan/40 hover:text-fg-cyan transition-all duration-200"
-          title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
+          title={theme === "dark" ? "Light mode" : "Dark mode"}
         >
-          {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+          {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
           {(!collapsed || isMobile) && (
-            <span className="tracking-wide">{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+            <span className="tracking-wide">
+              {theme === "dark" ? "Light Mode" : "Dark Mode"}
+            </span>
           )}
         </button>
         {!isMobile && (
           <button
-            onClick={() => setCollapsed(c => !c)}
+            onClick={() => setCollapsed((c) => !c)}
             className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-muted-foreground bg-muted/40 hover:bg-muted hover:text-foreground transition-all duration-200"
           >
-            {collapsed ? <ChevronRight size={18} /> : <><ChevronLeft size={18}/><span>Collapse Sidebar</span></>}
+            {collapsed ? (
+              <ChevronRight size={18} />
+            ) : (
+              <>
+                <ChevronLeft size={18} />
+                <span>Collapse Sidebar</span>
+              </>
+            )}
           </button>
         )}
       </div>
@@ -158,10 +197,10 @@ export function AppSidebar() {
     <>
       {/* ─── DESKTOP SIDEBAR ────────────────────────────── */}
       <aside
-        style={{ background: 'var(--sidebar, #080F1A)' }}
+        style={{ background: "var(--sidebar, #080F1A)" }}
         className={cn(
-          'hidden md:flex sticky top-0 h-screen flex-col shrink-0 transition-all duration-300 z-40',
-          'border-r border-border/50 shadow-xl',
+          "hidden md:flex sticky top-0 h-screen flex-col shrink-0 transition-all duration-300 z-40",
+          "border-r border-border/50 shadow-xl",
           sidebarWidth,
         )}
       >
@@ -169,20 +208,25 @@ export function AppSidebar() {
       </aside>
 
       {/* ─── MOBILE HEADER ────────────────────────────── */}
-      <header 
-        style={{ background: 'var(--sidebar, #080F1A)' }}
-        className="md:hidden sticky top-0 z-40 flex items-center justify-between px-5 py-4 border-b border-border/50 shadow-md">
+      <header
+        style={{ background: "var(--sidebar, #080F1A)" }}
+        className="md:hidden sticky top-0 z-40 flex items-center justify-between px-5 py-4 border-b border-border/50 shadow-md"
+      >
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-fg-cyan to-fg-cyan/40 flex items-center justify-center shrink-0 shadow-[0_0_12px_rgba(0,200,255,0.3)]">
+          <div className="w-9 h-9 rounded-xl bg-linear-to-br from-fg-cyan to-fg-cyan/40 flex items-center justify-center shrink-0 shadow-[0_0_12px_rgba(0,200,255,0.3)]">
             <Waves size={18} className="text-white dark:text-dark-base" />
           </div>
           <div>
-            <p className="text-base font-bold text-foreground leading-none tracking-wide">FloodGuard</p>
-            <p className="text-[10px] font-mono text-muted-foreground tracking-widest mt-1">IoT MONITOR</p>
+            <p className="text-base font-bold text-foreground leading-none tracking-wide">
+              FloodGuard
+            </p>
+            <p className="text-[10px] font-mono text-muted-foreground tracking-widest mt-1">
+              IoT MONITOR
+            </p>
           </div>
         </div>
-        
-        <button 
+
+        <button
           onClick={() => setMobileMenuOpen(true)}
           className="p-2.5 rounded-xl bg-muted/50 border border-border text-foreground hover:bg-accent transition-colors"
         >
@@ -204,15 +248,15 @@ export function AppSidebar() {
             />
             {/* Sliding Menu */}
             <motion.aside
-              initial={{ x: '-100%' }}
+              initial={{ x: "-100%" }}
               animate={{ x: 0 }}
-              exit={{ x: '-100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              style={{ background: 'var(--sidebar, #080F1A)' }}
+              exit={{ x: "-100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              style={{ background: "var(--sidebar, #080F1A)" }}
               className="md:hidden fixed inset-y-0 left-0 w-[85vw] max-w-sm flex flex-col z-50 border-r border-border/50 shadow-2xl"
             >
               <div className="absolute top-4 right-4">
-                <button 
+                <button
                   onClick={() => setMobileMenuOpen(false)}
                   className="p-2.5 rounded-full bg-muted/50 border border-border text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
                 >
