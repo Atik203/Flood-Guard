@@ -76,8 +76,8 @@ export default function DashboardPage() {
           {[
             { label: 'ML Predictions Today', value: mlStats.predictions_today.toLocaleString(), color: '#C084FC', sub: 'Decision Tree classifier' },
             { label: 'Model Accuracy',        value: `${mlStats.accuracy}%`,                    color: '#00E676', sub: 'Trained on 2,000 samples' },
-            { label: 'Alerts (24h)',           value: '6',                                        color: '#FF4444', sub: '2 CRITICAL, 3 HIGH, 1 MED' },
-            { label: 'Gate Operations',        value: '4',                                        color: '#FFAA00', sub: 'OPEN 2× · CLOSE 2×' },
+            { label: 'Alerts (24h)',           value: '10',                                       color: '#FF4444', sub: '1 CRIT, 3 HIGH, 4 MED' },
+            { label: 'Gate Operations',        value: '5',                                        color: '#FFAA00', sub: 'OPEN 2× · CLOSE 2× · FLUSH 1×' },
             { label: 'Uptime',                 value: '127.4h',                                   color: '#00C8FF', sub: 'Since last reboot' },
             { label: 'Data Points',            value: sensorTimeline.length.toString(),           color: '#00E676', sub: '10-min intervals stored' },
           ].map((s, i) => (
