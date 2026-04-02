@@ -8,6 +8,7 @@ import models
 from datetime import datetime, timedelta
 from ml_service import MLService
 from mqtt_service import MQTTService
+from simulator_service import SimulatorService
 import threading
 import os
 from fastapi.middleware.cors import CORSMiddleware
@@ -33,14 +34,18 @@ ml_service = MLService()
 ml_service.load_model()
 
 mqtt_service = MQTTService(ml_service=ml_service)
+simulator = SimulatorService()
 
 @app.on_event("startup")
 def startup_event():
     mqtt_service.start()
+    if os.getenv("SIMULATE_MODE", "false").lower() == "true":
+        simulator.start()
 
 @app.on_event("shutdown")
 def shutdown_event():
     mqtt_service.stop()
+    simulator.stop()
 
 class SensorReadingResponse(BaseModel):
     id: int
