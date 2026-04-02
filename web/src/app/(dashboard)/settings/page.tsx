@@ -3,9 +3,20 @@ import { motion } from 'framer-motion';
 import { Settings, Moon, Sun, Bell, Sliders } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useTheme } from '@/context/ThemeProvider';
+import { useState } from 'react';
 
 export default function SettingsPage() {
   const { theme, toggleTheme } = useTheme();
+
+  const [toggles, setToggles] = useState({
+    telegram: true,
+    high: true,
+    medium: false
+  });
+
+  const handleToggle = (key: keyof typeof toggles) => {
+    setToggles(prev => ({ ...prev, [key]: !prev[key] }));
+  };
 
   const thresholds = [
     { label: 'MEDIUM Threshold', key: 'medium', value: 20, unit: 'cm', color: '#FFAA00' },
@@ -49,13 +60,16 @@ export default function SettingsPage() {
             <CardHeader className="pb-2"><p className="text-[9px] font-mono tracking-[3px] text-muted-foreground uppercase mb-1">ALERTS</p><CardTitle className="text-base flex items-center gap-2"><Bell size={16}/> Notifications</CardTitle></CardHeader>
             <CardContent className="space-y-3">
               {[
-                { label: 'Telegram Alerts', sub: 'Send to bot when CRITICAL', on: true },
-                { label: 'HIGH level alert', sub: 'Also send telegram for HIGH', on: true },
-                { label: 'MEDIUM warning',  sub: 'Dashboard only, no Telegram',  on: false },
+                { key: 'telegram', label: 'Telegram Alerts', sub: 'Send to bot when CRITICAL', on: toggles.telegram },
+                { key: 'high',     label: 'HIGH level alert', sub: 'Also send telegram for HIGH', on: toggles.high },
+                { key: 'medium',   label: 'MEDIUM warning',  sub: 'Dashboard only, no Telegram',  on: toggles.medium },
               ].map(item => (
-                <div key={item.label} className="flex items-center justify-between">
+                <div key={item.key} className="flex items-center justify-between">
                   <div><p className="text-sm font-medium">{item.label}</p><p className="text-xs text-muted-foreground">{item.sub}</p></div>
-                  <div className={`w-10 h-5 rounded-full relative cursor-pointer transition-colors ${item.on ? 'bg-fg-cyan' : 'bg-muted'}`}>
+                  <div 
+                    onClick={() => handleToggle(item.key as keyof typeof toggles)}
+                    className={`w-10 h-5 rounded-full relative cursor-pointer transition-colors ${item.on ? 'bg-fg-cyan' : 'bg-muted'}`}
+                  >
                     <div className={`w-4 h-4 rounded-full bg-white absolute top-0.5 transition-all ${item.on ? 'right-0.5' : 'left-0.5'}`} />
                   </div>
                 </div>
