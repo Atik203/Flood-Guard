@@ -163,22 +163,29 @@ export const buildSteps: BuildStep[] = [
     phase: 'Hardware Phase',
     phaseColor: '#00C8FF',
     title: 'Gather all components & test each one',
-    description: 'Before building anything, verify every component works individually. This prevents debugging hell later.',
+    description: 'Before building anything, verify every component works individually. This prevents debugging hell later when everything is connected.',
     tasks: [
-      'Buy: ESP32 WROOM-32, HC-SR04, YL-83, YF-S201, DHT22, SG90 servo, L298N driver, 0.96" OLED SSD1306, active buzzer, breadboard, jumper wires',
-      'Test HC-SR04 alone with Arduino code — confirm it reads distance in cm correctly',
-      'Test rain sensor — dip in water, confirm analog output changes on ADC',
-      'Test servo — confirm it sweeps 0°→90°→180° with PWM signal from ESP32',
+      'Buy: ESP32 WROOM-32, HC-SR04, YL-83 rain sensor, YFS-401 mini flow sensor (3.5mm nozzle), DHT22, SG90 servo, L298N driver, SSD1306 0.96" OLED, active buzzer, 5V mini submersible pump, 5V relay module, breadboard, jumper wires, 1kΩ+2kΩ+4.7kΩ resistors, 6mm silicone tube (~50cm), 2× plastic tray/basin',
+      'Test HC-SR04 alone with Arduino code — confirm it reads distance in cm correctly with voltage divider on ECHO pin',
+      'Test YFS-401 flow sensor — blow through the nozzle gently and confirm pulse count registers on interrupt pin GPIO 19',
+      'Test rain sensor — dip in water, confirm analog output changes on ADC (GPIO 34)',
+      'Test servo — confirm it sweeps 0°→90°→180° with PWM signal from ESP32 GPIO 25',
+      'Test relay module — drive GPIO 27 HIGH and confirm relay clicks and LED lights up',
     ],
     code: {
       language: 'cpp',
-      content: `// Quick HC-SR04 test on ESP32
+      content: `// Quick HC-SR04 test (with voltage divider on ECHO)
 #define TRIG 5  // GPIO 5
-#define ECHO 18 // GPIO 18
-digitalWrite(TRIG, HIGH); delayMicroseconds(10);
-digitalWrite(TRIG, LOW);
-duration = pulseIn(ECHO, HIGH);
-distance_cm = duration * 0.034 / 2;`,
+#define ECHO 18 // GPIO 18 — connect via 1kΩ/2kΩ divider!
+void setup() { pinMode(TRIG,OUTPUT); pinMode(ECHO,INPUT); Serial.begin(115200); }
+void loop() {
+  digitalWrite(TRIG, HIGH); delayMicroseconds(10);
+  digitalWrite(TRIG, LOW);
+  long duration = pulseIn(ECHO, HIGH);
+  float dist_cm = duration * 0.034 / 2;
+  Serial.println(dist_cm); // Should show ~20cm in open air
+  delay(500);
+}`,
     },
   },
   {
@@ -186,13 +193,15 @@ distance_cm = duration * 0.034 / 2;`,
     phase: 'Hardware Phase',
     phaseColor: '#00C8FF',
     title: 'Wire everything on breadboard first',
-    description: 'Never solder first. Wire on breadboard, test fully, then solder on perf board for final build.',
+    description: 'Never solder first. Wire on breadboard, test fully, then move to final build. The YFS-401 nozzle fits directly onto 6mm silicone tube for the prototype drain.',
     tasks: [
-      'HC-SR04: VCC→3.3V, GND→GND, TRIG→GPIO5, ECHO→GPIO18 (use voltage divider on ECHO: 1kΩ + 2kΩ)',
+      'HC-SR04: VCC→5V (from VIN), GND→GND, TRIG→GPIO5, ECHO→GPIO18 via voltage divider (1kΩ R1 + 2kΩ R2 to GND)',
       'YL-83 Rain: VCC→3.3V, GND→GND, A0→GPIO34 (analog), D0→GPIO35 (digital threshold)',
-      'YF-S201 Flow: VCC→5V (needs 5V), GND→GND, Signal→GPIO19 (configure interrupt)',
+      'YFS-401 Flow: VCC→5V, GND→GND, Signal→GPIO19 (interrupt). Push 6mm tube onto 3.5mm nozzle barb',
+      'DHT22: VCC→3.3V, GND→GND, Data→GPIO23 with 4.7kΩ pull-up resistor to 3.3V',
       'OLED SSD1306: VCC→3.3V, GND→GND, SDA→GPIO21, SCL→GPIO22',
-      'Servo + L298N: L298N IN1→GPIO25 (PWM), L298N 5V separate power supply',
+      'SG90 + L298N: L298N IN1→GPIO25 (PWM), L298N motor power from separate 5V supply (NOT from ESP32 3.3V)',
+      'Relay Module: VCC→5V, GND→GND, IN→GPIO27. Connect Relay COM+NO to pump + wire and 5V',
       'Buzzer: + →GPIO26, − →GND',
     ],
   },

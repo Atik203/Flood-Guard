@@ -118,13 +118,15 @@ const STACK = [
   { label: 'ESP32 WROOM-32', icon: '🔲', color: '#00C8FF' },
   { label: 'Raspberry Pi 5', icon: '🍓', color: '#FFAA00' },
   { label: 'Arduino C++',    icon: '⚡', color: '#00C8FF' },
-  { label: 'Python 3.11',    icon: '🐍', color: '#00E676' },
+  { label: 'Python 3.12',    icon: '🐍', color: '#00E676' },
   { label: 'scikit-learn',   icon: '🤖', color: '#C084FC' },
   { label: 'Mosquitto MQTT', icon: '📡', color: '#FFAA00' },
+  { label: 'FastAPI',        icon: '🚀', color: '#00E676' },
   { label: 'Next.js 16',     icon: '▲',  color: '#00C8FF' },
-  { label: 'SQLite',         icon: '🗄️', color: '#00E676' },
+  { label: 'Supabase',       icon: '🗄️', color: '#00E676' },
   { label: 'Telegram API',   icon: '✈️', color: '#00C8FF' },
-  { label: 'Tailwind CSS',   icon: '🎨', color: '#C084FC' },
+  { label: '5V Mini Pump',   icon: '🚰', color: '#C084FC' },
+  { label: 'YFS-401 Sensor', icon: '💧', color: '#00C8FF' },
 ];
 
 /* ─── System flow steps ───────────────────────────────── */
@@ -139,14 +141,15 @@ const FLOW = [
 
 /* ─── Hardware specs ──────────────────────────────────── */
 const HARDWARE = [
-  { name: 'HC-SR04 Ultrasonic',  role: 'Water Level Sensor',  detail: 'Measures distance from sensor to water surface (cm). Range: 2–400cm. Accuracy ±3mm.',       icon: '📡', color: '#00C8FF' },
-  { name: 'YL-83 Rain Module',   role: 'Rain Intensity',       detail: 'Analog + digital output. Detects rain and measures intensity (0–100%). Mounted on top lid.', icon: '🌧️', color: '#00C8FF' },
-  { name: 'YF-S201 Flow Meter',  role: 'Flow Rate Sensor',     detail: 'Hall-effect pulse counter. Measures water flow through drain pipe in L/min.',                icon: '💧', color: '#00C8FF' },
-  { name: 'DHT22',               role: 'Temp + Humidity',      detail: 'High-precision digital sensor. ±0.5°C temperature, ±2% humidity — used as model feature.',  icon: '🌡️', color: '#FFAA00' },
-  { name: 'ESP32 WROOM-32',      role: 'Edge Controller',      detail: 'Dual-core 240MHz MCU. Handles all sensor reads, OLED display, buzzer, servo, and Wi-Fi.',    icon: '🔲', color: '#00E676' },
-  { name: 'Raspberry Pi 5 (8GB)',role: 'Central Brain',        detail: 'BCM2712 @ 2.4GHz. Runs ML inference, MQTT broker, Flask API, Next.js dashboard 24/7.',       icon: '🍓', color: '#FFAA00' },
-  { name: 'SG90 Servo + L298N',  role: 'Automated Gate',       detail: 'Servo drives drain gate flap. L298N handles power amplification for reliable operation.',     icon: '⚙️', color: '#FF7A00' },
-  { name: 'OLED SSD1306 0.96"',  role: 'Local LCD Display',   detail: 'I2C display on ESP32 shows live water level, rain status, and current risk class locally.',   icon: '🖥️', color: '#C084FC' },
+  { name: 'HC-SR04 Ultrasonic',  role: 'Water Level Sensor',  detail: 'Measures distance from sensor to water surface (cm). Range: 2–400cm. Accuracy ±3mm. Mounted at top of basin.',       icon: '📡', color: '#00C8FF' },
+  { name: 'YL-83 Rain Module',   role: 'Rain Intensity',       detail: 'Analog + digital output. Detects simulated rain from pump drip nozzle. Measures intensity (0–100%). Tilted 30–45°.', icon: '🌧️', color: '#00C8FF' },
+  { name: 'YFS-401 Flow Sensor', role: 'Mini Flow Meter',      detail: 'Compact Hall-effect sensor. 0.3–6 L/min range, 3.5mm nozzle — ideal for the small prototype drain tube.',             icon: '💧', color: '#00C8FF' },
+  { name: 'DHT22',               role: 'Temp + Humidity',      detail: 'High-precision digital sensor. ±0.5°C temperature, ±2% humidity — used as model feature.',                          icon: '🌡️', color: '#FFAA00' },
+  { name: 'ESP32 WROOM-32',      role: 'Edge Controller',      detail: 'Dual-core 240MHz MCU. Handles all sensor reads, OLED display, buzzer, servo, pump relay, and Wi-Fi MQTT.',           icon: '🔲', color: '#00E676' },
+  { name: 'Raspberry Pi 5 (8GB)',role: 'Central Brain',        detail: 'BCM2712 @ 2.4GHz. Runs ML inference, MQTT broker, FastAPI server, and Telegram bot 24/7.',                          icon: '🍓', color: '#FFAA00' },
+  { name: 'SG90 Servo + L298N',  role: 'Automated Gate',       detail: 'Servo drives drain gate flap 0°–180°. L298N handles power amplification isolation from ESP32.',                       icon: '⚙️', color: '#FF7A00' },
+  { name: '5V Mini Pump + Relay',role: 'Demo Simulator',       detail: 'Submersible 5V pump fills the basin and drips on rain sensor to simulate flood/rain in the classroom. Relay-switched from GPIO 27.', icon: '🚰', color: '#00C8FF' },
+  { name: 'OLED SSD1306 0.96"',  role: 'Local LCD Display',   detail: 'I2C display on ESP32 shows live water level, rain status, and current risk class locally.',                         icon: '🖥️', color: '#C084FC' },
 ];
 
 /* ─── Stats ───────────────────────────────────────────── */
@@ -154,7 +157,7 @@ const STATS = [
   { value: '96.5%',  label: 'ML Accuracy',      color: '#00E676' },
   { value: '<2ms',   label: 'Prediction Speed',  color: '#00C8FF' },
   { value: '4',      label: 'Sensor Modules',    color: '#C084FC' },
-  { value: '1s',     label: 'Data Interval',     color: '#FFAA00' },
+  { value: '500ms',  label: 'Sample Interval',   color: '#FFAA00' },
 ];
 
 /* ─── Main Home Page ──────────────────────────────────── */
@@ -357,7 +360,7 @@ export default function HomePage() {
         <motion.div initial={{ opacity:0, y:24 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} className="text-center mb-16">
           <SectionLabel>Hardware</SectionLabel>
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">Physical Components</h2>
-          <p className="text-muted-foreground mt-4 max-w-xl mx-auto">8 carefully chosen hardware modules working as a unified sensing, computing, and actuation platform.</p>
+          <p className="text-muted-foreground mt-4 max-w-xl mx-auto">9 hardware modules — sensors, controllers, actuators, and a mini pump — working as a unified classroom prototype.</p>
         </motion.div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -387,10 +390,10 @@ export default function HomePage() {
 
           <div className="flex flex-col items-center gap-0 max-w-lg mx-auto">
             {[
-              { layer: '① Sensor Layer',    bg: 'border-fg-cyan/40',   text: 'text-fg-cyan',   items: ['HC-SR04 • Ultrasonic', 'YL-83 • Rain', 'YF-S201 • Flow', 'DHT22 • Temp/Humidity'], arrow: 'GPIO/ADC Direct Wire' },
-              { layer: '② ESP32 Edge',      bg: 'border-fg-amber/40',  text: 'text-fg-amber',  items: ['240MHz Dual-Core · 520KB SRAM', 'Wi-Fi MQTT Publisher', 'OLED Display · Buzzer'], arrow: 'Wi-Fi · MQTT Protocol' },
-              { layer: '③ Raspberry Pi 5',  bg: 'border-fg-purple/40', text: 'text-fg-purple', items: ['BCM2712 @ 2.4GHz · 8GB RAM', 'ML Decision Tree Model', 'Flask API · SQLite · Telegram'], arrow: 'HTTP · Telegram · CSV' },
-              { layer: '④ Output Layer',    bg: 'border-fg-green/40',  text: 'text-fg-green',  items: ['Web Dashboard (Next.js)', 'Telegram Phone Alerts', 'SQLite Data Archive'], arrow: null },
+              { layer: '① Sensor Layer',    bg: 'border-fg-cyan/40',   text: 'text-fg-cyan',   items: ['HC-SR04 • Ultrasonic', 'YL-83 • Rain', 'YFS-401 • Flow', 'DHT22 • Temp/Humidity'], arrow: 'GPIO/ADC Direct Wire' },
+              { layer: '② ESP32 Edge',      bg: 'border-fg-amber/40',  text: 'text-fg-amber',  items: ['240MHz Dual-Core · 520KB SRAM', 'Wi-Fi MQTT Publisher', 'OLED · Buzzer · Pump Relay'], arrow: 'Wi-Fi · MQTT Protocol' },
+              { layer: '③ Raspberry Pi 5',  bg: 'border-fg-purple/40', text: 'text-fg-purple', items: ['BCM2712 @ 2.4GHz · 8GB RAM', 'ML Decision Tree Model', 'FastAPI · Supabase · Telegram'], arrow: 'HTTP · Telegram · REST' },
+              { layer: '④ Output Layer',    bg: 'border-fg-green/40',  text: 'text-fg-green',  items: ['Web Dashboard (Next.js)', 'Telegram Phone Alerts', 'Supabase PostgreSQL'], arrow: null },
             ].map((layer, i) => (
               <div key={layer.layer} className="w-full">
                 <motion.div initial={{ opacity:0, x: i%2===0?-20:20 }} whileInView={{ opacity:1, x:0 }} viewport={{ once:true }} transition={{ delay:i*0.1 }}
