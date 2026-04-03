@@ -10,6 +10,29 @@ export interface ComponentSpec {
   description: string;
 }
 
+export interface BOMItem {
+  id: number;
+  category: string;
+  name: string;
+  model: string;
+  qty: number;
+  voltage: string;
+  current: string;
+  specs: string;
+  purpose: string;
+  icon: string;
+  color: string;
+}
+
+export interface PowerEntry {
+  component: string;
+  voltage: string;
+  currentTypical: string;
+  currentPeak: string;
+  notes: string;
+  color: string;
+}
+
 export interface PinMapping {
   gpio: string;
   component: string;
@@ -57,13 +80,13 @@ export const sensors: ComponentSpec[] = [
     description: 'Detects rain intensity. Mounted on top lid angled toward sky.',
   },
   {
-    id: 'yf-s201',
-    name: 'YF-S201',
-    model: 'Flow Rate Sensor',
+    id: 'yfs-401',
+    name: 'YFS-401',
+    model: 'Mini Flow Sensor (Sea)',
     icon: '💧',
     color: '#00C8FF',
     pins: ['GPIO 19 (IRQ)'],
-    description: 'Measures water flow rate in L/min. Inline on drain pipe.',
+    description: 'Compact hall-effect flow sensor. 0.3–6 L/min range, 3.5mm nozzle. Perfect for small tabletop drain channel in classroom prototype.',
   },
   {
     id: 'dht22',
@@ -105,20 +128,21 @@ export const piChips = [
 
 // ─── GPIO Pin Map ──────────────────────────────────────────────────────────────
 export const pinMappings: PinMapping[] = [
-  { gpio: 'GPIO 5',      component: 'HC-SR04 TRIG',       type: 'OUT',        typeClass: 'gpio',  voltage: '3.3V',     notes: 'Send 10µs HIGH pulse to trigger' },
-  { gpio: 'GPIO 18',     component: 'HC-SR04 ECHO',       type: 'IN',         typeClass: 'gpio',  voltage: '3.3V',     notes: 'Use voltage divider! HC-SR04 ECHO = 5V, ESP32 max = 3.3V' },
-  { gpio: 'GPIO 34',     component: 'YL-83 Analog',       type: 'ADC1-CH6',   typeClass: 'adc',   voltage: '3.3V',     notes: '0–4095 = dry–wet. Input only pin, no pull-up' },
-  { gpio: 'GPIO 35',     component: 'YL-83 Digital',      type: 'IN',         typeClass: 'gpio',  voltage: '3.3V',     notes: 'HIGH = no rain, LOW = rain detected (threshold pot on module)' },
-  { gpio: 'GPIO 19',     component: 'YF-S201 Signal',     type: 'IRQ IN',     typeClass: 'gpio',  voltage: '5V→3.3V',  notes: 'Use interrupt (attachInterrupt). Pulses per second → L/min formula' },
-  { gpio: 'GPIO 23',     component: 'DHT22 Data',         type: 'IN/OUT',     typeClass: 'gpio',  voltage: '3.3V',     notes: '1-wire protocol. Use 4.7kΩ pull-up to 3.3V' },
-  { gpio: 'GPIO 21',     component: 'OLED SDA',           type: 'I2C SDA',    typeClass: 'i2c',   voltage: '3.3V',     notes: 'Default I2C SDA on ESP32. Address 0x3C' },
-  { gpio: 'GPIO 22',     component: 'OLED SCL',           type: 'I2C SCL',    typeClass: 'i2c',   voltage: '3.3V',     notes: 'Default I2C SCL. 400kHz fast mode' },
-  { gpio: 'GPIO 25',     component: 'L298N IN1 (Motor)',  type: 'PWM OUT',    typeClass: 'pwm',   voltage: '3.3V',     notes: 'PWM signal to L298N. L298N uses separate 5V/12V for motor power' },
-  { gpio: 'GPIO 26',     component: 'Buzzer +',           type: 'OUT',        typeClass: 'gpio',  voltage: '3.3V',     notes: 'Active buzzer (has internal oscillator). HIGH = buzz ON' },
-  { gpio: 'GPIO 1 (TX0)', component: 'USB Serial TX',    type: 'UART0',      typeClass: 'uart',  voltage: '3.3V',     notes: 'Used for flashing + debug Serial.print()' },
-  { gpio: 'GPIO 3 (RX0)', component: 'USB Serial RX',    type: 'UART0',      typeClass: 'uart',  voltage: '3.3V',     notes: 'Backup serial to Pi if Wi-Fi fails' },
-  { gpio: '3.3V pin',    component: 'Sensor VCC (most)',  type: 'POWER',      typeClass: 'pwr',   voltage: '3.3V',     notes: 'Max 600mA total. HC-SR04, OLED, rain sensor use this' },
-  { gpio: 'VIN (5V)',    component: 'YF-S201 + L298N',   type: 'POWER',      typeClass: 'pwr',   voltage: '5V',       notes: 'Flow sensor needs 5V. Comes from USB input of ESP32' },
+  { gpio: 'GPIO 5',      component: 'HC-SR04 TRIG',        type: 'OUT',        typeClass: 'gpio',  voltage: '3.3V',     notes: 'Send 10µs HIGH pulse to trigger' },
+  { gpio: 'GPIO 18',     component: 'HC-SR04 ECHO',        type: 'IN',         typeClass: 'gpio',  voltage: '3.3V',     notes: 'Use voltage divider! HC-SR04 ECHO = 5V, ESP32 max = 3.3V' },
+  { gpio: 'GPIO 34',     component: 'YL-83 Analog',        type: 'ADC1-CH6',   typeClass: 'adc',   voltage: '3.3V',     notes: '0–4095 = dry–wet. Input only pin, no pull-up' },
+  { gpio: 'GPIO 35',     component: 'YL-83 Digital',       type: 'IN',         typeClass: 'gpio',  voltage: '3.3V',     notes: 'HIGH = no rain, LOW = rain detected (threshold pot on module)' },
+  { gpio: 'GPIO 19',     component: 'YFS-401 Signal',      type: 'IRQ IN',     typeClass: 'gpio',  voltage: '3.5–5V',   notes: 'Interrupt pin. 5.5 pulses/mL. Pulses/sec → L/min via formula' },
+  { gpio: 'GPIO 23',     component: 'DHT22 Data',          type: 'IN/OUT',     typeClass: 'gpio',  voltage: '3.3V',     notes: '1-wire protocol. Use 4.7kΩ pull-up to 3.3V' },
+  { gpio: 'GPIO 21',     component: 'OLED SDA',            type: 'I2C SDA',    typeClass: 'i2c',   voltage: '3.3V',     notes: 'Default I2C SDA on ESP32. Address 0x3C' },
+  { gpio: 'GPIO 22',     component: 'OLED SCL',            type: 'I2C SCL',    typeClass: 'i2c',   voltage: '3.3V',     notes: 'Default I2C SCL. 400kHz fast mode' },
+  { gpio: 'GPIO 25',     component: 'L298N IN1 (Gate)',    type: 'PWM OUT',    typeClass: 'pwm',   voltage: '3.3V',     notes: 'PWM signal to L298N for SG90 servo gate control' },
+  { gpio: 'GPIO 27',     component: '5V Pump Relay IN',    type: 'OUT',        typeClass: 'gpio',  voltage: '3.3V',     notes: 'Drives relay module IN pin. HIGH = pump ON (via relay)' },
+  { gpio: 'GPIO 26',     component: 'Buzzer +',            type: 'OUT',        typeClass: 'gpio',  voltage: '3.3V',     notes: 'Active buzzer (has internal oscillator). HIGH = buzz ON' },
+  { gpio: 'GPIO 1 (TX0)', component: 'USB Serial TX',     type: 'UART0',      typeClass: 'uart',  voltage: '3.3V',     notes: 'Used for flashing + debug Serial.print()' },
+  { gpio: 'GPIO 3 (RX0)', component: 'USB Serial RX',     type: 'UART0',      typeClass: 'uart',  voltage: '3.3V',     notes: 'Backup serial to Pi if Wi-Fi fails' },
+  { gpio: '3.3V pin',    component: 'Sensor VCC (most)',   type: 'POWER',      typeClass: 'pwr',   voltage: '3.3V',     notes: 'Max 600mA total. HC-SR04, OLED, rain sensor use this' },
+  { gpio: 'VIN (5V)',    component: 'YFS-401 + L298N',    type: 'POWER',      typeClass: 'pwr',   voltage: '5V',       notes: 'YFS-401 operates 3.5–24V. Connect to 5V for reliable pulses' },
   { gpio: 'GND',         component: 'All components GND', type: 'GND',        typeClass: 'pwr',   voltage: '0V',       notes: 'Connect all component grounds together (common ground)' },
 ];
 
@@ -406,4 +430,167 @@ def check_trend(data):
       'Demo preventive: slowly add water + rain — confirm gate pre-opens before reaching HIGH threshold',
     ],
   },
+];
+
+// ─── Bill of Materials ──────────────────────────────────────────────────────────
+export const bomItems: BOMItem[] = [
+  {
+    id: 1, category: 'Sensors',
+    name: 'Ultrasonic Sensor', model: 'HC-SR04',
+    qty: 1, voltage: '5V', current: '15mA',
+    specs: 'Range: 2–400 cm | Accuracy: ±3mm | Frequency: 40kHz',
+    purpose: 'Measures water depth inside the prototype basin from above the water surface',
+    icon: '📡', color: '#00C8FF',
+  },
+  {
+    id: 2, category: 'Sensors',
+    name: 'Rain Sensor Module', model: 'YL-83',
+    qty: 1, voltage: '3.3–5V', current: '20mA',
+    specs: 'Analog + Digital output | Onboard sensitivity pot | PCB size: 3.2×1.4cm',
+    purpose: 'Detects simulated rain from the water pump drip nozzle — measures rain intensity 0–100%',
+    icon: '🌧️', color: '#00C8FF',
+  },
+  {
+    id: 3, category: 'Sensors',
+    name: 'Mini Flow Sensor', model: 'YFS-401 (Sea)',
+    qty: 1, voltage: '3.5–24V', current: '15mA',
+    specs: 'Flow: 0.3–6 L/min | Nozzle: 3.5mm (1/8") | Hall-effect pulse | ~5.5 pulses/mL',
+    purpose: 'Measures actual water flow rate through the prototype drain tube — used for blockage detection',
+    icon: '💧', color: '#00C8FF',
+  },
+  {
+    id: 4, category: 'Sensors',
+    name: 'Temp & Humidity Sensor', model: 'DHT22',
+    qty: 1, voltage: '3.3–5V', current: '2.5mA',
+    specs: 'Temp: −40 to +80°C (±0.5°C) | Humidity: 0–100% RH (±2%) | 1-wire protocol',
+    purpose: 'Ambient environment monitoring — used as an ML input feature alongside water data',
+    icon: '🌡️', color: '#FFAA00',
+  },
+  {
+    id: 5, category: 'Controllers',
+    name: 'ESP32 Dev Board', model: 'ESP32 WROOM-32',
+    qty: 1, voltage: '3.3V (onboard LDO)', current: '240mA peak',
+    specs: '240MHz Dual-Core | 520KB SRAM | Wi-Fi 802.11 b/g/n | BLE 4.2 | 34 GPIO',
+    purpose: 'Edge microcontroller — reads all sensors, drives actuators, publishes MQTT data',
+    icon: '🔲', color: '#00C8FF',
+  },
+  {
+    id: 6, category: 'Controllers',
+    name: 'Single-Board Computer', model: 'Raspberry Pi 5 (8GB)',
+    qty: 1, voltage: '5V', current: '1000–1600mA',
+    specs: 'BCM2712 @ 2.4GHz | 4× Cortex-A76 | 8GB LPDDR4X | USB-C power | PCIe 2.0',
+    purpose: 'Central brain — runs ML inference, MQTT broker, FastAPI server, and Telegram bot',
+    icon: '🍓', color: '#FFAA00',
+  },
+  {
+    id: 7, category: 'Actuators',
+    name: 'Servo Motor', model: 'SG90 (9g Micro)',
+    qty: 1, voltage: '5V', current: '100–500mA',
+    specs: 'Torque: 1.8 kg·cm | Speed: 0.1 sec/60° | Angle: 0°–180° | PWM control',
+    purpose: 'Physically opens and closes the drain gate proportionally (0°–180°) based on ML risk level',
+    icon: '⚙️', color: '#00E676',
+  },
+  {
+    id: 8, category: 'Actuators',
+    name: '5V Mini Submersible Pump', model: 'SJ-0180 / Generic 5V DC',
+    qty: 1, voltage: '3–6V DC', current: '200–300mA',
+    specs: 'Flow: ~80–120 L/hr | Head: up to 40cm | 65mm × 32mm body | Submersible',
+    purpose: 'Simulates rain (via drip nozzle) and fills the flood basin during classroom demonstrations',
+    icon: '🚰', color: '#00C8FF',
+  },
+  {
+    id: 9, category: 'Drivers & Modules',
+    name: 'Motor Driver', model: 'L298N Dual H-Bridge',
+    qty: 1, voltage: '5–35V motor side', current: '2A per channel',
+    specs: 'Dual H-Bridge | Motor: 5–35V | Logic: 5V | PWM compatible | Onboard 5V regulator',
+    purpose: 'Controls SG90 servo gate power — isolates ESP32 from high-current servo draw',
+    icon: '⚡', color: '#C084FC',
+  },
+  {
+    id: 10, category: 'Drivers & Modules',
+    name: '5V Relay Module', model: 'Single Channel Relay',
+    qty: 1, voltage: '5V coil', current: '70–90mA coil',
+    specs: 'Contact: 250V/10A AC or 30V/10A DC | Active LOW trigger | LED indicator',
+    purpose: 'Switches the 5V pump ON/OFF under ESP32 GPIO control (safely isolates logic from pump)',
+    icon: '🔌', color: '#FF4444',
+  },
+  {
+    id: 11, category: 'Display & Feedback',
+    name: 'OLED Display', model: 'SSD1306 0.96"',
+    qty: 1, voltage: '3.3–5V', current: '20mA',
+    specs: '128×64 pixels | I2C 0x3C | Viewing angle: ~160° | White or blue pixels',
+    purpose: 'Shows live water level, risk level, and gate status locally on the prototype box',
+    icon: '🖥️', color: '#00C8FF',
+  },
+  {
+    id: 12, category: 'Display & Feedback',
+    name: 'Active Buzzer', model: 'Piezo Buzzer 5V',
+    qty: 1, voltage: '3.3–5V', current: '30mA',
+    specs: 'Frequency: ~2400Hz | Built-in oscillator | Sound level: ~85 dB | GPIO direct-drive',
+    purpose: 'Audible alarm on CRITICAL flood risk and blockage detection events',
+    icon: '🔔', color: '#FF4444',
+  },
+  {
+    id: 13, category: 'Passives & Wiring',
+    name: 'Breadboard + Jumper Wires', model: 'Full-size + M-M/M-F/F-F sets',
+    qty: 1, voltage: 'N/A', current: 'N/A',
+    specs: '830 tie-point breadboard | 40× M-M, 40× M-F, 40× F-F wires | Various lengths',
+    purpose: 'Prototyping all connections without soldering — essential for classroom build',
+    icon: '🔗', color: '#888888',
+  },
+  {
+    id: 14, category: 'Passives & Wiring',
+    name: 'Resistor Kit', model: '1kΩ + 2kΩ + 4.7kΩ (at min)',
+    qty: 5, voltage: '0.25W', current: 'N/A',
+    specs: '1kΩ for voltage divider R1 | 2kΩ for divider R2 | 4.7kΩ pull-up for DHT22',
+    purpose: 'Voltage divider on HC-SR04 ECHO pin (5V→3.3V) + DHT22 pull-up resistor',
+    icon: '🧩', color: '#888888',
+  },
+  {
+    id: 15, category: 'Power',
+    name: 'USB Power Bank', model: '10,000 mAh 5V/2A',
+    qty: 1, voltage: '5V', current: '2A output',
+    specs: '10,000 mAh | Dual USB output | 5V/2A per port | Passthrough charging',
+    purpose: 'Powers ESP32 + all sensors + relay + buzzer during wireless classroom demo (~4–6hr runtime)',
+    icon: '🔋', color: '#00E676',
+  },
+  {
+    id: 16, category: 'Power',
+    name: 'USB-C Power Adapter', model: '5V / 3A (15W)',
+    qty: 1, voltage: '5V', current: '3A',
+    specs: 'USB-C PD | Min 5V/3A required for Raspberry Pi 5 | Official Pi 5 adapter recommended',
+    purpose: 'Powers Raspberry Pi 5 — requires dedicated adapter, cannot share with ESP32 power bank',
+    icon: '🔌', color: '#FFAA00',
+  },
+  {
+    id: 17, category: 'Physical Structure',
+    name: 'Transparent Plastic Tray / Basin', model: 'Acrylic or Polypropylene',
+    qty: 2, voltage: 'N/A', current: 'N/A',
+    specs: 'Main basin: ~30cm × 20cm × 15cm | Reservoir: ~15cm × 10cm × 10cm | Transparent preferred',
+    purpose: 'Main flood basin (sensor mounting, water fill) + separate water reservoir for pump',
+    icon: '📦', color: '#888888',
+  },
+  {
+    id: 18, category: 'Physical Structure',
+    name: 'Silicone Tube / PVC Pipe', model: '6mm OD flexible tube',
+    qty: 1, voltage: 'N/A', current: 'N/A',
+    specs: '6mm OD matching YFS-401 nozzle | ~50cm length | Flexible | Water-tight connections',
+    purpose: 'Routes water from pump → drip nozzle (rain sim) and through drain → YFS-401 → out',
+    icon: '🪤', color: '#888888',
+  },
+];
+
+// ─── Power Budget ────────────────────────────────────────────────────────────────────────────
+export const powerBudget: PowerEntry[] = [
+  { component: 'ESP32 WROOM-32',         voltage: '5V (USB)',   currentTypical: '80 mA',   currentPeak: '240 mA',  notes: 'Peak during Wi-Fi TX bursts. Average ~80mA with sensors polling', color: '#00C8FF' },
+  { component: 'HC-SR04',                voltage: '5V',         currentTypical: '15 mA',   currentPeak: '15 mA',   notes: 'Low current — steady 15mA when active', color: '#00C8FF' },
+  { component: 'YL-83 Rain Sensor',      voltage: '3.3V',       currentTypical: '20 mA',   currentPeak: '20 mA',   notes: 'Resistive PCB sensor — constant draw', color: '#00C8FF' },
+  { component: 'YFS-401 Flow Sensor',    voltage: '5V',         currentTypical: '15 mA',   currentPeak: '15 mA',   notes: 'Hall-effect — very low power, 15mA max', color: '#00C8FF' },
+  { component: 'DHT22',                  voltage: '3.3V',       currentTypical: '2.5 mA',  currentPeak: '2.5 mA',  notes: 'Very low draw — mostly idle between readings', color: '#FFAA00' },
+  { component: 'SSD1306 OLED',           voltage: '3.3V',       currentTypical: '20 mA',   currentPeak: '30 mA',   notes: 'Current varies with pixels lit. ~20mA typical', color: '#00C8FF' },
+  { component: 'Active Buzzer',          voltage: '3.3V',       currentTypical: '0 mA',    currentPeak: '30 mA',   notes: 'Only active during CRITICAL/BLOCKAGE events', color: '#FF4444' },
+  { component: 'SG90 Servo Motor',       voltage: '5V',         currentTypical: '100 mA',  currentPeak: '500 mA',  notes: 'Peak during rotation. Use L298N for isolation from ESP32', color: '#00E676' },
+  { component: 'Relay Module Coil',      voltage: '5V',         currentTypical: '70 mA',   currentPeak: '90 mA',   notes: 'Only active when pump is running', color: '#FF4444' },
+  { component: '5V Mini Water Pump',     voltage: '5V',         currentTypical: '200 mA',  currentPeak: '300 mA',  notes: 'Via relay — NOT through ESP32. Separate power rail recommended', color: '#00C8FF' },
+  { component: 'Raspberry Pi 5 (8GB)',   voltage: '5V (USB-C)', currentTypical: '1000 mA', currentPeak: '1600 mA', notes: 'Requires dedicated 5V/3A USB-C adapter. Cannot share with ESP32 bank', color: '#FFAA00' },
 ];

@@ -64,7 +64,7 @@ Our system addresses all four of these gaps in a single, unified prototype:
 |---|---|
 | No water level monitoring | HC-SR04 ultrasonic sensor measures water depth in real time |
 | Manual drain gates (no automation) | SG90 servo motor controlled by ML risk predictions |
-| Drain blockages go undetected | YF-S201 flow sensor cross-referenced with gate position |
+| Drain blockages go undetected | YFS-401 mini flow sensor cross-referenced with gate position |
 | No early warning | Telegram Bot sends instant alerts; trend logic pre-acts |
 
 ---
@@ -138,25 +138,28 @@ Our system addresses all four of these gaps in a single, unified prototype:
 |---|---|---|---|---|
 | 1 | **Ultrasonic Sensor** | HC-SR04 | Measures water level (cm) | Range: 2–400cm, Accuracy: ±3mm |
 | 2 | **Rain Sensor Module** | YL-83 | Detects rain & measures intensity (0–100%) | Analog + Digital output |
-| 3 | **Water Flow Meter** | YF-S201 | Measures drain flow rate (L/min) | Hall-effect pulse counter |
+| 3 | **Mini Water Flow Sensor** | YFS-401 (Sea) | Measures drain flow rate (0.3–6 L/min) | Hall-effect pulse, 3.5mm nozzle, 15mA |
 | 4 | **Temp/Humidity Sensor** | DHT22 | Ambient temp & humidity | ±0.5°C, ±2% RH accuracy |
 | 5 | **Microcontroller (Edge)** | ESP32 WROOM-32 | Reads sensors, drives actuators | 240MHz Dual-Core, 520KB SRAM, Wi-Fi |
 | 6 | **Single-Board Computer (Brain)** | Raspberry Pi 5 (8GB) | ML inference, MQTT broker, API server | BCM2712 @ 2.4GHz |
 | 7 | **Servo Motor + Driver** | SG90 + L298N | Physically opens/closes drain gate | 0°–180° range |
-| 8 | **OLED Display** | SSD1306 0.96" | Shows live data locally on device | I2C interface, 128×64 pixels |
-| 9 | **Buzzer** | Active Piezo | Audible local alarm | On CRITICAL risk events |
+| 8 | **5V Mini Submersible Pump** | SJ-0180 / Generic 5V DC | Simulates rain/flood in classroom demo | 80–120 L/hr, 200–300mA, submersible |
+| 9 | **5V Relay Module** | Single Channel Relay | Switches pump ON/OFF from ESP32 GPIO | Active LOW, 250V/10A contact rating |
+| 10 | **OLED Display** | SSD1306 0.96" | Shows live data locally on device | I2C interface, 128×64 pixels |
+| 11 | **Buzzer** | Active Piezo | Audible local alarm | On CRITICAL risk events |
 
 ### Wiring Summary (ESP32 GPIO)
 
 ```
 HC-SR04 Trigger  → GPIO 5
-HC-SR04 Echo     → GPIO 18
+HC-SR04 Echo     → GPIO 18 (via voltage divider 1kΩ+2kΩ)
 YL-83 Analog Out → ADC1 (GPIO 34)
 YL-83 Digital    → GPIO 35
-YF-S201 Signal   → GPIO 19 (interrupt)
-DHT22 Data       → GPIO 4
-SG90 PWM Signal  → GPIO 13 (via L298N)
-Buzzer           → GPIO 12
+YFS-401 Signal   → GPIO 19 (interrupt, ~5.5 pulses/mL)
+DHT22 Data       → GPIO 23
+SG90 PWM Signal  → GPIO 25 (via L298N)
+Pump Relay IN    → GPIO 27 (HIGH = pump ON)
+Buzzer           → GPIO 26
 OLED SDA         → GPIO 21 (I2C)
 OLED SCL         → GPIO 22 (I2C)
 ```
@@ -533,34 +536,53 @@ Interactive API docs available at: `http://localhost:8000/docs`
 
 ## 🖥️ Physical Demo Plan
 
-### Setup for Faculty Presentation
+### Classroom Prototype Setup
+
+> **Note:** This is a tabletop classroom prototype, not a field installation. All flood/rain events are **manually simulated** using a 5V mini water pump and relay module. The system behaves identically to a real deployment but scaled to fit a classroom table.
+
+### Physical Prototype Structure
+
+**Two-container setup on a table:**
+
+1. **Main Basin** (~30cm × 20cm × 15cm transparent tray):
+   - **HC-SR04** mounted at the top, pointing down at the water surface
+   - **YL-83 rain sensor** on a side bracket — receives drip water from the pump nozzle
+   - **SG90 servo** attached to a cardboard gate flap covering the drain hole
+   - **YFS-401 flow sensor** (3.5mm nozzle) inline on the drain outlet tube
+
+2. **Water Reservoir** (~15cm × 10cm × 10cm container):
+   - **5V mini submersible pump** submerged at the bottom
+   - **6mm silicone tube** exits and splits:
+     - Branch 1 → drip nozzle over rain sensor (simulates rain)
+     - Branch 2 → fills the main basin (simulates flood)
+   - Pump ON/OFF via relay controlled by ESP32 GPIO 27
+
+3. **Electronics box** (project box or breadboard on table):
+   - ESP32 WROOM-32 on breadboard
+   - Raspberry Pi 5 beside it
+   - L298N driver for servo
+   - Relay module for pump
+   - Active buzzer
+   - OLED display showing live status
 
 **What the faculty will see:**
-1. **The physical build** — a model flood basin (box with water) with:
-   - HC-SR04 mounted above the water surface
-   - YL-83 rain sensor exposed to actual water droplets (from a dropper or spray bottle)
-   - YF-S201 flow meter on the drain pipe
-   - SG90 servo controlling a small gate flap on the drain hole
-   - OLED display showing live status
-   - Buzzer on the breadboard
-   - ESP32 and Raspberry Pi 5 visible
+1. **The physical build** — two transparent containers with sensors, pump, servo gate
+2. **The live dashboard** on a laptop/projector at `https://flood-guard-eta.vercel.app`
+3. **A phone** with Telegram bot notifications visible
 
-2. **The live dashboard** on a laptop/projector screen at `https://flood-guard-eta.vercel.app`
-
-3. **A phone** with the Telegram bot notifications visible
-
-### Live Demo Steps
+### Live Demo Steps (Faculty Presentation)
 
 | Step | What We Do | What Faculty Sees |
 |---|---|---|
-| 1 | Pour water into the flood basin slowly | Water level on dashboard rises in real time. Risk moves LOW → MEDIUM |
-| 2 | Trigger rain module (spray bottle) | Rain intensity jumps. ML model re-classifies to HIGH |
-| 3 | Pour more water to hit HIGH threshold | Gate servo physically rotates to 90°. Dashboard shows GATE OPEN |
-| 4 | Pour to CRITICAL threshold (>80cm) | Gate goes to 180°. Buzzer activates. Telegram alert arrives on phone |
-| 5 | Block the drain outlet manually | Flow reads 0 with gate open → System detects blockage → Auto-flush (180° pulse) |
-| 6 | Open the laptop dashboard | Show Alerts log, Water Level chart, ML Analytics page, Risk gauge |
-| 7 | Open Settings page | Change threshold from 80cm → 50cm live, show system re-classifies |
-| 8 | Show Telegram message | Faculty can see the exact alert message with water level and action |
+| 1 | Power on ESP32 (USB bank) + Pi (USB-C adapter). Wait 30s. | Dashboard shows sensor data, risk = LOW |
+| 2 | Turn on pump → water drips on rain sensor and fills basin | Rain % rises, water level rises on dashboard |
+| 3 | Water hits 20cm threshold | Risk → MEDIUM, gate servo rotates to 45° |
+| 4 | Keep pump running, water hits 50cm | Risk → HIGH, gate opens to 90°. Dashboard alert logged |
+| 5 | Water hits 80cm threshold | Gate → 180° (fully open). Buzzer sounds. Telegram alert on phone |
+| 6 | Block the drain outlet with foam/finger | Flow = 0 with gate open → Blockage detected → Auto-flush servo pulse |
+| 7 | Drain basin and restart slowly with both rain + fill simultaneously | Preventive logic triggers → gate pre-opens before threshold |
+| 8 | Open Settings page on dashboard | Change threshold 80cm → 50cm live, system reclassifies |
+| 9 | Show Alerts log, Water Level Chart, ML Analytics page | Faculty sees complete system telemetry and ML insights |
 
 ### Simulation Mode (If Hardware Unavailable)
 The server has a `SIMULATE_MODE=true` flag in `.env`. When enabled, `SimulatorService` runs a Python script that publishes fake ESP32 data to MQTT every 5 seconds — simulating natural floods with rain events. The entire system works identically without physical hardware.
@@ -572,7 +594,6 @@ if rain_intensity > 40:
 else:
     water_cm -= random.uniform(0.5, 2) # Draining when rain stops
 ```
-
 ---
 
 ## ☁️ Deployment Architecture
