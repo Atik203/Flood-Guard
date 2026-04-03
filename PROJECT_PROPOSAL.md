@@ -579,9 +579,9 @@ Interactive API docs available at: `http://localhost:8000/docs`
 
 ## 🖥️ Physical Demo Plan
 
-### Classroom Prototype Setup
+### Prototype Setup
 
-> **Note:** This is a tabletop classroom prototype, not a field installation. All flood/rain events are **manually simulated** using a 5V mini water pump and relay module. The system behaves identically to a real deployment but scaled to fit a classroom table.
+> **Note:** This is a tabletop prototype, not a field installation. All flood/rain events are **manually simulated** using a 5V mini water pump and relay module. The system behaves identically to a real deployment but scaled to fit a classroom table.
 
 ### Physical Prototype Structure
 
@@ -608,15 +608,9 @@ Interactive API docs available at: `http://localhost:8000/docs`
    - Active buzzer
    - OLED display showing live status
 
-**What the faculty will see:**
+### Live Demo Steps ( Presentation)
 
-1. **The physical build** — two transparent containers with sensors, pump, servo gate
-2. **The live dashboard** on a laptop/projector at `https://flood-guard-eta.vercel.app`
-3. **A phone** with Telegram bot notifications visible
-
-### Live Demo Steps (Faculty Presentation)
-
-| Step | What We Do                                                          | What Faculty Sees                                                    |
+| Step | What We Do                                                          | Presentation                                                         |
 | ---- | ------------------------------------------------------------------- | -------------------------------------------------------------------- |
 | 1    | Power on ESP32 (USB bank) + Pi (USB-C adapter). Wait 30s.           | Dashboard shows sensor data, risk = LOW                              |
 | 2    | Turn on pump → water drips on rain sensor and fills basin           | Rain % rises, water level rises on dashboard                         |
@@ -685,7 +679,7 @@ ESP32 ← → MQTT               Raspberry Pi 5 OR Render.com
 
 ---
 
-## ❓ Potential Faculty Questions & Answers
+## ❓ Potential Questions & Answers
 
 ### On Machine Learning
 
