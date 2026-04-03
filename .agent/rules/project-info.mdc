@@ -1,0 +1,49 @@
+---
+description: High-level overview of the FloodGuard project proposal, architecture, features, and hardware
+globs:
+  - "*"
+alwaysApply: true
+---
+
+# FloodGuard — Project Context & Proposal
+
+## Overview
+**FloodGuard** is an IoT-based intelligent flood detection and prevention system designed for a Microprocessor Systems Lab prototype. It uses an ESP32 as the edge sensing device, a Raspberry Pi 5 as the central ML brain, and a Next.js web dashboard for real-time monitoring.
+
+## System Architecture
+
+### 1. Sensor Layer (ESP32 Edge)
+Reads sensors every 500ms and publishes JSON over MQTT (`floodguard/sensors/data`).
+- **HC-SR04**: Ultrasonic water level sensor (measures distance)
+- **YL-83**: Rain sensor module (intensity 0-100%)
+- **YFS-401**: Mini water flow sensor (Hall-effect, measures drain flow in L/min)
+- **DHT22**: Temperature and humidity sensor
+- **Actuators**: SG90 Servo (controls drain gate), 5V Mini Submersible Pump (simulates rain/flood via Relay), Active Buzzer, OLED SSD1306 0.96"
+
+### 2. Central Brain (Raspberry Pi 5)
+- **Mosquitto MQTT Broker**: Listens for ESP32 data.
+- **Python FastAPI Server**: Processes data, runs ML inference, provides REST API.
+- **Decision Tree ML Model (scikit-learn)**: Classifies risk based on sensor inputs.
+- **Database**: Supabase PostgreSQL (primary) / SQLite (fallback). Auto-cleans to stay under 500MB free tier.
+- **Telegram Bot**: Sends push notifications on HIGH/CRITICAL events.
+
+### 3. Output Layer (Web Dashboard)
+- **Next.js 16 (App Router)** frontend.
+- Polling via **SWR** (stale-while-revalidate) every 2 seconds for live data.
+- UI built with **Tailwind CSS v4**, **shadcn/ui**, **Framer Motion**, and **Recharts**.
+
+## Core Features (What the system does)
+1. **ML Flood Prediction Engine**: Decision Tree classifies risk into LOW, MEDIUM, HIGH, or CRITICAL based on `water_cm`, `rain_intensity`, `flow_lpm`, and `rate_of_change`. (96.5% accuracy).
+2. **Proportional Drain Control**: Servo gate opens 0°–180° proportionally based on water level severity, avoiding binary ON/OFF water hammer issues.
+3. **Blockage Detection & Auto-Flush**: Cross-references gate state and flow meter. If the gate is open but flow is near zero, it detects a blockage and rapidly pulses the servo to 180° to mechanically dislodge debris.
+4. **ML-Driven Preventive Action**: Pre-opens gate to 50% if trend analysis over the last 10 readings shows both water and rain are simultaneously rising rapidly, acting before absolute thresholds are crossed.
+5. **Real-Time Telemetry & Dashboard**: Live analytics dashboard reflecting system state instantly.
+6. **Automated Alert System**: Database logging and Telegram push notifications sent on CRITICAL/HIGH risk or blockage events.
+
+## Physical Prototype Demo Structure
+A tabletop classroom setup with two containers:
+1. **Main Basin**: Holds the HC-SR04 at the top, YL-83 on the side, servo gate on the drain, and YFS-401 flow sensor inline on the drain output.
+2. **Reservoir**: Contains the 5V submersible pump, which pumps water to drip on the rain sensor and fill the basin, manually simulating flood/rain conditions for faculty. The pump is cleanly switched by ESP32 GPIO 27 via a 5V relay module.
+
+## Relevant Links/Documentation
+Always reference the actual `PROJECT_PROPOSAL.md` document for deeper specifics (such as full Q&A from faculty, API paths, complete database schemas, or physical demo steps).
