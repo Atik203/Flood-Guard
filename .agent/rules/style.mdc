@@ -1,0 +1,98 @@
+---
+description: FloodGuard project style and coding standards for AI agents
+globs:
+  - "web/src/**/*.tsx"
+  - "web/src/**/*.ts"
+  - "web/src/**/*.css"
+alwaysApply: true
+---
+
+# FloodGuard — Style & Coding Standards
+
+## Design System Color Tokens
+Always use these Tailwind CSS custom tokens in classNames. Never use raw hex colors in className unless the value comes from a dynamic data array (use `style={{ color }}` for those).
+
+| Token | Hex | Usage |
+|---|---|---|
+| `text-fg-cyan` / `border-fg-cyan` / `bg-fg-cyan` | `#00C8FF` | Primary accent, water, sensors, links |
+| `text-fg-amber` / `border-fg-amber` | `#FFAA00` | Raspberry Pi, warnings, MEDIUM risk |
+| `text-fg-purple` / `border-fg-purple` | `#C084FC` | ML/analytics, blockage events |
+| `text-fg-green` / `border-fg-green` | `#00E676` | Success, LOW risk, gate closed, power |
+| `text-fg-red` / `border-fg-red` | `#FF4444` | CRITICAL risk, danger, safety warnings |
+
+## Tailwind CSS v4 Rules
+- ✅ Use `bg-linear-to-r`, `bg-linear-to-br`, etc. for gradients
+- ❌ NEVER use `bg-gradient-to-*` — deprecated in Tailwind v4
+
+## Typography
+- Headings: `font-bold tracking-tight text-foreground`
+- Section labels: `font-mono tracking-[6px] text-fg-cyan/90 uppercase font-bold`
+- Body: `text-muted-foreground leading-relaxed`
+- Technical labels/values: `font-mono` class
+
+## Component Patterns
+
+### Cards
+```tsx
+<Card className="border-border/50 bg-card">
+  <CardHeader className="pb-3 border-b border-border/40">
+    <CardTitle className="text-lg text-fg-cyan">Title</CardTitle>
+  </CardHeader>
+  <CardContent className="p-5">...</CardContent>
+</Card>
+```
+
+### Accent-colored card border (top line style)
+```tsx
+<div className="rounded-2xl border border-border/50 bg-card relative overflow-hidden">
+  <div className="absolute top-0 inset-x-0 h-[2px]" style={{ background: color }} />
+  ...
+</div>
+```
+
+### Category filter buttons
+```tsx
+<button onClick={() => setFilter(cat)}
+  className={cn(
+    'text-sm font-mono px-4 py-1.5 rounded-full border transition-all',
+    filter === cat
+      ? 'bg-fg-amber/15 text-fg-amber border-fg-amber/40'
+      : 'border-border/50 text-muted-foreground hover:border-fg-amber/30'
+  )}>
+  {cat}
+</button>
+```
+
+### Section header with divider line
+```tsx
+<div className="flex items-center gap-3 mb-6 border-b border-border/50 pb-4">
+  <Icon className="text-fg-cyan" size={24} />
+  <h2 className="text-2xl font-bold text-foreground">Section Title</h2>
+</div>
+```
+
+## Animation Rules (Framer Motion)
+- Page-level lists: `initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}`
+- Staggered rows: add `transition={{ delay: i * 0.05 }}`
+- Hover lift: `whileHover={{ y: -4, transition: { duration: 0.2 } }}`
+- Always use `motion.div` / `motion.tr` for animated elements
+
+## File Organization
+- All architecture tab data → `web/src/data/mockArchitectureData.ts`
+- New tab components → defined as named functions ABOVE the default export in `architecture/page.tsx`
+- Shared UI primitives → `web/src/components/ui/` (shadcn — do not edit)
+- Global context → `web/src/context/ThemeProvider.tsx`
+
+## Naming Conventions
+- Components: PascalCase (`PrototypeBuildTab`, `PhysicalTab`)
+- Data arrays: camelCase (`bomItems`, `powerBudget`, `buildSteps`)
+- Interfaces: PascalCase (`BOMItem`, `PowerEntry`, `ComponentSpec`)
+- Files: kebab-case for routes (`page.tsx`, `FeaturesTab.tsx`)
+
+## Key Don'ts
+- ❌ Don't write `YF-S201` — the correct sensor is `YFS-401`
+- ❌ Don't reference Flask — backend is FastAPI
+- ❌ Don't reference SQLite — storage is Supabase
+- ❌ Don't import `mockData` — import from `mockArchitectureData`
+- ❌ Don't edit `src/components/ui/` files manually
+- ❌ Don't use inline styles for layout — only for dynamic colors/values from data
